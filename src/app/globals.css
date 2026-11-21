@@ -1,26 +1,178 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --font-handwriting: 'Caveat', 'Kalam', cursive, sans-serif;
+    --font-heading: 'Playfair Display', Georgia, serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: #dfd4c5;
+    background-image: 
+      radial-gradient(#d3c5b2 1.5px, transparent 1.5px),
+      radial-gradient(#d3c5b2 1.5px, #dfd4c5 1.5px);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom font utilities */
+.font-handwriting {
+  font-family: var(--font-handwriting);
+}
+
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+/* Realistic paper shadows */
+.paper-shadow-sm {
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.paper-shadow-md {
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 8px 16px -4px rgba(44, 34, 30, 0.15),
+    0 16px 24px -8px rgba(44, 34, 30, 0.1);
+}
+
+.paper-shadow-lg {
+  box-shadow: 
+    0 2px 5px rgba(0, 0, 0, 0.12),
+    0 14px 28px -6px rgba(44, 34, 30, 0.22),
+    0 24px 38px -10px rgba(44, 34, 30, 0.15);
+}
+
+.paper-shadow-lifted {
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    0 20px 32px -8px rgba(44, 34, 30, 0.28),
+    0 32px 48px -12px rgba(44, 34, 30, 0.18);
+}
+
+/* Vintage enamel fridge realistic lighting and curves */
+.fridge-body-enamel {
+  background: linear-gradient(
+    135deg,
+    #fffdf9 0%,
+    #faf6ee 25%,
+    #f4ece0 60%,
+    #ede0cf 85%,
+    #e5d5c0 100%
+  );
+  box-shadow: 
+    inset 0 3px 6px rgba(255, 255, 255, 0.9),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.1),
+    inset 4px 0 12px rgba(255, 255, 255, 0.7),
+    inset -4px 0 16px rgba(160, 140, 120, 0.25),
+    0 20px 50px -10px rgba(35, 25, 20, 0.35),
+    0 35px 80px -20px rgba(35, 25, 20, 0.25);
+}
+
+/* Refrigerator door bevel and seam */
+.fridge-door-bevel {
+  box-shadow:
+    inset 2px 2px 4px rgba(255, 255, 255, 0.9),
+    inset -2px -2px 6px rgba(120, 100, 80, 0.2),
+    0 8px 16px rgba(50, 35, 25, 0.15);
+}
+
+/* Vintage Chrome Reflection */
+.chrome-finish {
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #e8ecef 25%,
+    #b0b8c0 48%,
+    #88929c 52%,
+    #d8dee4 75%,
+    #ffffff 100%
+  );
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Chrome handle horizontal/vertical */
+.chrome-handle {
+  background: linear-gradient(
+    90deg,
+    #8e9ba4 0%,
+    #d1dbe3 15%,
+    #ffffff 35%,
+    #f0f4f8 50%,
+    #b5c1cb 75%,
+    #717e88 95%,
+    #535e67 100%
+  );
+  box-shadow:
+    4px 6px 12px rgba(20, 15, 10, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Paper texture subtle background */
+.paper-texture {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 0);
+  background-size: 8px 8px;
+}
+
+/* Tape effect */
+.masking-tape {
+  background: rgba(255, 250, 230, 0.75);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(1px);
+  position: relative;
+}
+
+.masking-tape::before,
+.masking-tape::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(210, 190, 160, 0.4) 3px,
+    rgba(210, 190, 160, 0.4) 6px
+  );
+}
+
+.masking-tape::before {
+  left: -3px;
+}
+
+.masking-tape::after {
+  right: -3px;
+}
+
+/* Custom scrollbar for recipe sheet */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 100, 80, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 100, 80, 0.45);
 }
