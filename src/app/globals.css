@@ -9,12 +9,10 @@
 
   body {
     font-family: var(--font-body);
-    background-color: #dfd4c5;
-    background-image: 
-      radial-gradient(#d3c5b2 1.5px, transparent 1.5px),
-      radial-gradient(#d3c5b2 1.5px, #dfd4c5 1.5px);
-    background-size: 40px 40px;
-    background-position: 0 0, 20px 20px;
+    background-color: #2a201a;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
 }
 
@@ -31,130 +29,276 @@
   font-family: var(--font-body);
 }
 
+/* Atmospheric Kitchen Room Background */
+.kitchen-room-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: 
+    linear-gradient(to bottom, rgba(28, 20, 16, 0.45) 0%, rgba(35, 25, 20, 0.35) 60%, rgba(20, 14, 10, 0.75) 100%),
+    url('https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=2400&q=85');
+  background-size: cover;
+  background-position: center 25%;
+  background-repeat: no-repeat;
+  filter: blur(1.5px);
+  transform: scale(1.03); /* prevent blur edge bleeding */
+}
+
+/* Ambient Kitchen Lighting Glow */
+.kitchen-sunlight {
+  position: fixed;
+  top: 0;
+  left: 10%;
+  width: 70vw;
+  height: 60vh;
+  background: radial-gradient(
+    ellipse at top,
+    rgba(255, 240, 215, 0.28) 0%,
+    rgba(255, 230, 190, 0.12) 45%,
+    transparent 75%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Hardwood Floor Perspective at the bottom */
+.kitchen-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 180px;
+  background: linear-gradient(
+    to bottom,
+    #4a3324 0%,
+    #382417 35%,
+    #2b1b11 70%,
+    #1f130b 100%
+  );
+  box-shadow: inset 0 6px 16px rgba(0, 0, 0, 0.7);
+  z-index: 2;
+}
+
+.kitchen-floor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 110px,
+    rgba(0, 0, 0, 0.35) 111px,
+    transparent 112px
+  );
+  opacity: 0.6;
+}
+
 /* Realistic paper shadows */
 .paper-shadow-sm {
-  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.12), 0 4px 6px -1px rgba(0, 0, 0, 0.08);
 }
 
 .paper-shadow-md {
   box-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.1),
-    0 8px 16px -4px rgba(44, 34, 30, 0.15),
-    0 16px 24px -8px rgba(44, 34, 30, 0.1);
+    0 1px 3px rgba(0, 0, 0, 0.15),
+    0 8px 16px -4px rgba(44, 34, 30, 0.22),
+    0 16px 24px -8px rgba(44, 34, 30, 0.15);
 }
 
 .paper-shadow-lg {
   box-shadow: 
-    0 2px 5px rgba(0, 0, 0, 0.12),
-    0 14px 28px -6px rgba(44, 34, 30, 0.22),
-    0 24px 38px -10px rgba(44, 34, 30, 0.15);
+    0 2px 5px rgba(0, 0, 0, 0.15),
+    0 14px 28px -6px rgba(44, 34, 30, 0.28),
+    0 24px 38px -10px rgba(44, 34, 30, 0.2);
 }
 
 .paper-shadow-lifted {
   box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.12),
-    0 20px 32px -8px rgba(44, 34, 30, 0.28),
-    0 32px 48px -12px rgba(44, 34, 30, 0.18);
+    0 4px 8px rgba(0, 0, 0, 0.18),
+    0 22px 36px -8px rgba(44, 34, 30, 0.36),
+    0 34px 52px -12px rgba(44, 34, 30, 0.25);
 }
 
-/* Vintage enamel fridge realistic lighting and curves */
-.fridge-body-enamel {
+/* Vintage Baked Enamel Door Face */
+.fridge-enamel-door {
+  background: 
+    /* Vertical ambient lighting highlight down left-third */
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.65) 18%,
+      rgba(255, 255, 255, 0.35) 32%,
+      rgba(0, 0, 0, 0.02) 65%,
+      rgba(0, 0, 0, 0.08) 100%
+    ),
+    /* Rich vintage cream base gradient */
+    linear-gradient(
+      180deg,
+      #fefcf6 0%,
+      #f9f4e8 30%,
+      #f3ecdc 70%,
+      #ebe1cf 100%
+    );
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.95),
+    inset 0 -2px 4px rgba(120, 100, 80, 0.25),
+    inset 3px 0 6px rgba(255, 255, 255, 0.7),
+    inset -3px 0 8px rgba(140, 115, 90, 0.25);
+}
+
+/* 3D Side Cabinet Perspective Extrusion */
+.fridge-side-cabinet {
   background: linear-gradient(
-    135deg,
-    #fffdf9 0%,
-    #faf6ee 25%,
-    #f4ece0 60%,
-    #ede0cf 85%,
-    #e5d5c0 100%
+    180deg,
+    #cfc2ae 0%,
+    #beaf9b 40%,
+    #a89985 80%,
+    #8f806d 100%
   );
   box-shadow: 
-    inset 0 3px 6px rgba(255, 255, 255, 0.9),
-    inset 0 -4px 10px rgba(0, 0, 0, 0.1),
-    inset 4px 0 12px rgba(255, 255, 255, 0.7),
-    inset -4px 0 16px rgba(160, 140, 120, 0.25),
-    0 20px 50px -10px rgba(35, 25, 20, 0.35),
-    0 35px 80px -20px rgba(35, 25, 20, 0.25);
+    inset 2px 0 4px rgba(255, 255, 255, 0.4),
+    inset -3px 0 8px rgba(0, 0, 0, 0.45);
 }
 
-/* Refrigerator door bevel and seam */
-.fridge-door-bevel {
+/* Whole Appliance Master Shadow (standing in 3D space) */
+.fridge-appliance-shadow {
   box-shadow:
-    inset 2px 2px 4px rgba(255, 255, 255, 0.9),
-    inset -2px -2px 6px rgba(120, 100, 80, 0.2),
-    0 8px 16px rgba(50, 35, 25, 0.15);
+    /* Left side ambient cast */
+    -18px 12px 35px rgba(15, 10, 8, 0.4),
+    /* Right side deep ambient cast */
+    24px 18px 50px rgba(15, 10, 8, 0.45),
+    /* Soft diffuse atmospheric drop */
+    0 35px 85px -15px rgba(10, 6, 4, 0.6);
 }
 
-/* Vintage Chrome Reflection */
+/* Contact floor shadow directly under fridge feet */
+.fridge-floor-shadow {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(10, 6, 4, 0.75) 0%,
+    rgba(15, 10, 7, 0.5) 45%,
+    rgba(25, 18, 12, 0.15) 70%,
+    transparent 85%
+  );
+}
+
+/* Gasket Gap / Deep Horizontal Door Seam */
+.fridge-gasket-seam {
+  background: linear-gradient(
+    180deg,
+    #1d1612 0%,
+    #2c221b 35%,
+    #15100c 70%,
+    #3a2e25 100%
+  );
+  box-shadow:
+    inset 0 4px 6px rgba(0, 0, 0, 0.7),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Vintage Chrome Polish & Sheen */
 .chrome-finish {
   background: linear-gradient(
     180deg,
     #ffffff 0%,
-    #e8ecef 25%,
-    #b0b8c0 48%,
-    #88929c 52%,
-    #d8dee4 75%,
+    #e9eff3 20%,
+    #cbd5dd 45%,
+    #8a959f 50%,
+    #b9c4cc 55%,
+    #e4ebf0 80%,
     #ffffff 100%
   );
   box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.3),
-    inset 0 1px 1px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.45);
 }
 
-/* Chrome handle horizontal/vertical */
-.chrome-handle {
+/* Classic Heavy Vintage Chrome Pull Handle */
+.chrome-handle-vertical {
   background: linear-gradient(
     90deg,
-    #8e9ba4 0%,
-    #d1dbe3 15%,
-    #ffffff 35%,
-    #f0f4f8 50%,
-    #b5c1cb 75%,
-    #717e88 95%,
-    #535e67 100%
+    #7a8790 0%,
+    #b8c4cd 12%,
+    #ffffff 32%,
+    #e6edf2 48%,
+    #9ba8b2 75%,
+    #616d76 92%,
+    #454e55 100%
   );
   box-shadow:
-    4px 6px 12px rgba(20, 15, 10, 0.35),
-    inset 0 1px 2px rgba(255, 255, 255, 0.9),
-    inset 0 -1px 3px rgba(0, 0, 0, 0.5);
+    6px 10px 18px rgba(18, 12, 8, 0.45),
+    inset 0 2px 3px rgba(255, 255, 255, 0.95),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
 }
 
-/* Paper texture subtle background */
-.paper-texture {
-  background-image: radial-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 0);
-  background-size: 8px 8px;
-}
-
-/* Tape effect */
-.masking-tape {
-  background: rgba(255, 250, 230, 0.75);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(1px);
-  position: relative;
-}
-
-.masking-tape::before,
-.masking-tape::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 3px,
-    rgba(210, 190, 160, 0.4) 3px,
-    rgba(210, 190, 160, 0.4) 6px
+/* Chrome Escutcheon Mount Bracket */
+.chrome-bracket {
+  background: linear-gradient(
+    135deg,
+    #ffffff 0%,
+    #d1dbe2 30%,
+    #8f9ca6 70%,
+    #5f6b74 100%
   );
+  box-shadow:
+    3px 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9);
 }
 
-.masking-tape::before {
-  left: -3px;
+/* Heavy Chrome Vintage Hinge */
+.chrome-hinge {
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #cfd9e1 25%,
+    #95a3ad 50%,
+    #6a7781 75%,
+    #9aa7b1 100%
+  );
+  box-shadow:
+    -3px 4px 8px rgba(0, 0, 0, 0.35),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.9),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.5);
 }
 
-.masking-tape::after {
-  right: -3px;
+/* Stamped Metal Base Grille */
+.fridge-base-grille {
+  background: linear-gradient(
+    180deg,
+    #2c231d 0%,
+    #1d1612 50%,
+    #130e0b 100%
+  );
+  box-shadow:
+    inset 0 4px 8px rgba(0, 0, 0, 0.8),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.1);
+}
+
+.grille-slot {
+  background: linear-gradient(
+    180deg,
+    #0a0705 0%,
+    #050302 100%
+  );
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.9),
+    0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+/* Vintage Chrome Bullet Foot */
+.chrome-bullet-foot {
+  background: linear-gradient(
+    90deg,
+    #556067 0%,
+    #9cb0bc 25%,
+    #ffffff 50%,
+    #92a3af 80%,
+    #4a545a 100%
+  );
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.6),
+    inset 0 2px 3px rgba(255, 255, 255, 0.8);
 }
 
 /* Custom scrollbar for recipe sheet */
@@ -164,15 +308,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(0, 0, 0, 0.05);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(120, 100, 80, 0.25);
+  background: rgba(120, 100, 80, 0.35);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(120, 100, 80, 0.45);
+  background: rgba(120, 100, 80, 0.55);
 }
