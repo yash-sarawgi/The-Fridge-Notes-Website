@@ -9,7 +9,7 @@
 
   body {
     font-family: var(--font-body);
-    background-color: #1a120c;
+    background-color: #201712;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -29,215 +29,153 @@
   font-family: var(--font-body);
 }
 
-/* ================================================================= */
-/* RETRO KITCHEN SCENE (MATCHING REFERENCE IMAGE)                    */
-/* ================================================================= */
+/* Real Cozy Warm Kitchen Background */
+.kitchen-room-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: 
+    linear-gradient(to bottom, rgba(25, 18, 14, 0.42) 0%, rgba(35, 25, 20, 0.3) 50%, rgba(18, 12, 8, 0.75) 100%),
+    url('https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=2400&q=85');
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  filter: blur(2px);
+  transform: scale(1.04);
+}
 
-/* Warm Terracotta / Orange Upper Wall */
-.kitchen-orange-wall {
-  background: linear-gradient(
-    180deg,
-    #eb6e33 0%,
-    #df6228 65%,
-    #d1551d 100%
+/* Ambient Kitchen Lighting */
+.kitchen-sunlight {
+  position: fixed;
+  top: 0;
+  left: 5%;
+  width: 80vw;
+  height: 65vh;
+  background: radial-gradient(
+    ellipse at top,
+    rgba(255, 240, 215, 0.28) 0%,
+    rgba(255, 230, 190, 0.1) 45%,
+    transparent 75%
   );
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* White Ceramic Tile Backsplash with clean grout lines */
-.kitchen-tile-backsplash {
-  background-color: #f7f7f7;
-  background-image:
-    linear-gradient(to right, rgba(200, 205, 215, 0.45) 1.5px, transparent 1.5px),
-    linear-gradient(to bottom, rgba(200, 205, 215, 0.45) 1.5px, transparent 1.5px);
-  background-size: 56px 56px;
-  box-shadow: inset 0 6px 12px rgba(0, 0, 0, 0.15), inset 0 -6px 12px rgba(0, 0, 0, 0.08);
+/* Hardwood Kitchen Floor Plane */
+.kitchen-floor {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 160px;
+  background: linear-gradient(
+    to bottom,
+    #4a3324 0%,
+    #362215 40%,
+    #25160d 75%,
+    #180e07 100%
+  );
+  box-shadow: inset 0 8px 18px rgba(0, 0, 0, 0.7);
+  z-index: 2;
 }
 
-/* Herringbone / Chevron Parquet Floor matching the photo */
-.kitchen-herringbone-floor {
-  background: 
-    linear-gradient(135deg, #b87b58 25%, transparent 25%) -30px 0,
-    linear-gradient(225deg, #b87b58 25%, transparent 25%) -30px 0,
-    linear-gradient(315deg, #8a573b 25%, transparent 25%),
-    linear-gradient(45deg, #8a573b 25%, transparent 25%);
-  background-size: 60px 60px;
-  background-color: #6d4128;
-  box-shadow: inset 0 10px 25px rgba(0, 0, 0, 0.6);
+.kitchen-floor::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 120px,
+    rgba(0, 0, 0, 0.4) 121px,
+    transparent 122px
+  );
+  opacity: 0.55;
 }
 
 /* ================================================================= */
-/* RETRO 1950s ENAMEL REFRIGERATOR BODIES                            */
+/* VINTAGE RETRO REFRIGERATOR BODY (SMOOTH BAKED CREAM ENAMEL)       */
 /* ================================================================= */
 
-/* 1. Retro Cerulean / Smeg Blue (Exact match to reference photo!) */
-.fridge-enamel-blue {
+.vintage-fridge-body {
   background: 
-    /* Specular sunlight glare on upper right curve */
+    /* Soft specular sunlight highlight curving across upper-right */
     radial-gradient(
-      ellipse at 78% 12%,
+      ellipse at 78% 10%,
       rgba(255, 255, 255, 0.85) 0%,
-      rgba(255, 255, 255, 0.3) 25%,
+      rgba(255, 255, 255, 0.3) 24%,
       transparent 55%
     ),
-    /* Vertical gloss highlight down the left third */
+    /* Vertical soft ambient sheen down the left third */
     linear-gradient(
       90deg,
       rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.45) 14%,
-      rgba(255, 255, 255, 0.1) 28%,
-      transparent 50%,
-      rgba(0, 0, 0, 0.12) 100%
-    ),
-    /* Rich retro blue base gradient */
-    linear-gradient(
-      180deg,
-      #4bb4f5 0%,
-      #359ee0 30%,
-      #2286c9 70%,
-      #186fa8 100%
-    );
-  box-shadow:
-    inset 0 3px 6px rgba(255, 255, 255, 0.95),
-    inset 0 -3px 6px rgba(10, 45, 75, 0.4),
-    inset 4px 0 8px rgba(255, 255, 255, 0.5),
-    inset -4px 0 10px rgba(10, 45, 75, 0.4);
-}
-
-/* 2. Vintage Cream / Ivory */
-.fridge-enamel-cream {
-  background: 
-    radial-gradient(
-      ellipse at 78% 12%,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(255, 255, 255, 0.35) 25%,
-      transparent 55%
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0.55) 14%,
-      rgba(255, 255, 255, 0.1) 28%,
+      rgba(255, 255, 255, 0.5) 15%,
+      rgba(255, 255, 255, 0.1) 30%,
       transparent 50%,
       rgba(0, 0, 0, 0.08) 100%
     ),
+    /* Rich vintage cream base gradient */
     linear-gradient(
       180deg,
-      #fffdfa 0%,
-      #f8f2e4 30%,
-      #efe5d1 70%,
-      #e2d5bd 100%
+      #fefcf7 0%,
+      #f9f3e6 25%,
+      #f2e8d7 65%,
+      #e7dcc7 100%
     );
   box-shadow:
-    inset 0 3px 6px rgba(255, 255, 255, 0.95),
-    inset 0 -3px 6px rgba(100, 80, 60, 0.3),
-    inset 4px 0 8px rgba(255, 255, 255, 0.6),
-    inset -4px 0 10px rgba(100, 80, 60, 0.3);
+    /* Deep 3D ambient appliance cast shadow */
+    -18px 15px 40px rgba(0, 0, 0, 0.4),
+    22px 20px 50px rgba(0, 0, 0, 0.45),
+    0 35px 85px rgba(0, 0, 0, 0.55),
+    /* Inner enamel edge reflections */
+    inset 0 3px 5px rgba(255, 255, 255, 0.95),
+    inset 0 -3px 6px rgba(110, 90, 70, 0.25),
+    inset 4px 0 8px rgba(255, 255, 255, 0.65),
+    inset -4px 0 10px rgba(110, 90, 70, 0.25);
+  border: 4px solid #ede1cc;
 }
 
-/* 3. Retro Mint Sage */
-.fridge-enamel-mint {
-  background: 
-    radial-gradient(
-      ellipse at 78% 12%,
-      rgba(255, 255, 255, 0.85) 0%,
-      rgba(255, 255, 255, 0.3) 25%,
-      transparent 55%
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.18) 0%,
-      rgba(255, 255, 255, 0.48) 14%,
-      transparent 35%,
-      rgba(0, 0, 0, 0.1) 100%
-    ),
-    linear-gradient(
-      180deg,
-      #8be0cb 0%,
-      #6cd0b9 30%,
-      #4eb79f 70%,
-      #3ca089 100%
-    );
+/* Seam divider between freezer and fridge door */
+.fridge-seam-divider {
+  background: linear-gradient(
+    180deg,
+    #2c2017 0%,
+    #17100b 50%,
+    #2c2017 100%
+  );
   box-shadow:
-    inset 0 3px 6px rgba(255, 255, 255, 0.95),
-    inset 0 -3px 6px rgba(20, 65, 55, 0.35);
+    inset 0 3px 5px rgba(0, 0, 0, 0.7),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
 }
 
-/* 4. Pastel Dusty Pink */
-.fridge-enamel-pink {
-  background: 
-    radial-gradient(
-      ellipse at 78% 12%,
-      rgba(255, 255, 255, 0.85) 0%,
-      rgba(255, 255, 255, 0.3) 25%,
-      transparent 55%
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.18) 0%,
-      rgba(255, 255, 255, 0.48) 14%,
-      transparent 35%,
-      rgba(0, 0, 0, 0.1) 100%
-    ),
-    linear-gradient(
-      180deg,
-      #fbbcd2 0%,
-      #f4a1bd 30%,
-      #e885a6 70%,
-      #d46a8d 100%
-    );
-  box-shadow:
-    inset 0 3px 6px rgba(255, 255, 255, 0.95),
-    inset 0 -3px 6px rgba(70, 20, 35, 0.35);
+/* Floor contact shadow beneath fridge */
+.fridge-floor-shadow {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(15, 9, 5, 0.8) 0%,
+    rgba(25, 14, 8, 0.55) 45%,
+    rgba(35, 20, 12, 0.15) 70%,
+    transparent 85%
+  );
 }
 
-/* 3D Curved Retro Silhouette & Drop Shadow */
-.smeg-fridge-body {
-  box-shadow:
-    -15px 15px 35px rgba(0, 0, 0, 0.35),
-    20px 20px 45px rgba(0, 0, 0, 0.45),
-    0 35px 80px rgba(0, 0, 0, 0.55);
-}
-
-/* Chrome Dividing Seam Trim between Freezer and Fridge Doors */
-.smeg-chrome-divider {
+/* Polished Vintage Chrome Finish */
+.chrome-finish {
   background: linear-gradient(
     180deg,
     #ffffff 0%,
-    #d8e1e8 30%,
-    #9cb0be 50%,
-    #697884 52%,
-    #b2c1cc 70%,
+    #e8edf1 20%,
+    #cbd5dd 45%,
+    #88939e 50%,
+    #b9c4cd 55%,
+    #e4ebf0 80%,
     #ffffff 100%
   );
   box-shadow:
-    0 3px 6px rgba(0, 0, 0, 0.5),
-    inset 0 1px 1px rgba(255, 255, 255, 0.95);
-}
-
-/* Chrome cylinder feet resting on floor */
-.smeg-cylinder-foot {
-  background: linear-gradient(
-    90deg,
-    #5a6771 0%,
-    #a8b9c6 30%,
-    #ffffff 55%,
-    #9fb0be 80%,
-    #4a545c 100%
-  );
-  box-shadow:
-    0 8px 16px rgba(0, 0, 0, 0.65),
-    inset 0 2px 3px rgba(255, 255, 255, 0.8);
-}
-
-/* Floor shadow directly under the feet */
-.smeg-floor-shadow {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(15, 8, 4, 0.8) 0%,
-    rgba(25, 12, 6, 0.55) 45%,
-    rgba(35, 18, 10, 0.15) 70%,
-    transparent 85%
-  );
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.45);
 }
 
 /* ================================================================= */
@@ -245,38 +183,28 @@
 /* ================================================================= */
 
 .paper-shadow-sm {
-  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.15), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.12), 0 4px 6px -1px rgba(0, 0, 0, 0.08);
 }
 
 .paper-shadow-md {
   box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.15),
-    0 8px 18px -4px rgba(25, 15, 10, 0.3),
-    0 16px 26px -8px rgba(25, 15, 10, 0.2);
+    0 2px 4px rgba(0, 0, 0, 0.12),
+    0 8px 18px -4px rgba(45, 30, 20, 0.25),
+    0 16px 26px -8px rgba(45, 30, 20, 0.18);
+}
+
+.paper-shadow-lg {
+  box-shadow: 
+    0 3px 6px rgba(0, 0, 0, 0.15),
+    0 14px 28px -6px rgba(45, 30, 20, 0.28),
+    0 24px 38px -10px rgba(45, 30, 20, 0.22);
 }
 
 .paper-shadow-lifted {
   box-shadow: 
-    0 4px 8px rgba(0, 0, 0, 0.2),
-    0 22px 38px -8px rgba(25, 15, 10, 0.42),
-    0 36px 56px -12px rgba(25, 15, 10, 0.3);
-}
-
-/* Vintage Chrome Reflection */
-.chrome-finish {
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #e8ecef 25%,
-    #b0b8c0 48%,
-    #88929c 52%,
-    #d8dee4 75%,
-    #ffffff 100%
-  );
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.35),
-    inset 0 1px 1px rgba(255, 255, 255, 0.9),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.45);
+    0 4px 8px rgba(0, 0, 0, 0.18),
+    0 22px 36px -8px rgba(45, 30, 20, 0.35),
+    0 36px 52px -12px rgba(45, 30, 20, 0.25);
 }
 
 /* Custom scrollbar for recipe sheet */
@@ -286,17 +214,17 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(120, 100, 80, 0.3);
   border-radius: 9999px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(120, 100, 80, 0.55);
 }
