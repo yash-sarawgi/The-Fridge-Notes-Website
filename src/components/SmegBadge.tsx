@@ -6,6 +6,7 @@ import { siteConfig } from "@/config/siteConfig";
 interface SmegBadgeProps {
   onClick?: () => void;
   className?: string;
+  text?: string;
 }
 
 /**
@@ -15,12 +16,13 @@ interface SmegBadgeProps {
 export const SmegBadge: React.FC<SmegBadgeProps> = ({
   onClick,
   className = "",
+  text = "FRIDGE NOTES",
 }) => {
   // Letters to render with authentic wide tracking
-  const words = [
-    { text: "FRIDGE", letters: ["F", "R", "I", "D", "G", "E"] },
-    { text: "NOTES", letters: ["N", "O", "T", "E", "S"] },
-  ];
+  const words = text.split(" ").map((w) => ({
+    text: w,
+    letters: w.split(""),
+  }));
 
   return (
     <button

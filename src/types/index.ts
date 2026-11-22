@@ -25,6 +25,9 @@ export interface Recipe {
   paperColor?: string;
   magnetColor?: string;
   rotation?: number;
+  scale?: number;
+  xPos?: number;
+  yPos?: number;
   ingredients: Ingredient[];
   instructions: string[];
   kitchenNotes: string[];
@@ -45,6 +48,23 @@ export interface Category {
   iconName: string;
   description: string;
   pinPosition?: 'top-center' | 'top-left' | 'top-right';
+  xPos?: number;
+  yPos?: number;
+  scale?: number;
+  displayOrder?: number;
+}
+
+export interface FridgeSettings {
+  id: string;
+  badgeText: string;
+  tagline: string;
+  subIntro: string;
+  butterNoteText: string;
+  moodNoteText: string;
+  defaultAudioEnabled: boolean;
+  introNotePos?: { x: number; y: number; scale?: number; rotation?: number };
+  butterNotePos?: { x: number; y: number; scale?: number; rotation?: number };
+  moodNotePos?: { x: number; y: number; scale?: number; rotation?: number };
 }
 
 export interface SiteConfig {

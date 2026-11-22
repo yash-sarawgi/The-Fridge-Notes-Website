@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Search, Volume2, VolumeX, SlidersHorizontal, BookPlus, Sparkles, Heart } from "lucide-react";
+import Link from "next/link";
+import { Search, Volume2, VolumeX, SlidersHorizontal, BookPlus, Sparkles, Heart, Settings } from "lucide-react";
 import { Magnet } from "./Magnet";
 
 interface KitchenWhiteboardProps {
@@ -69,15 +70,15 @@ export const KitchenWhiteboard: React.FC<KitchenWhiteboardProps> = ({
               <span>{soundEnabled ? "Audio ON" : "Audio OFF"}</span>
             </button>
 
-            {/* Chef's Admin Preview button */}
-            <button
-              onClick={onOpenAdmin}
-              className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-900 border border-amber-300/80 hover:bg-amber-100 transition-colors cursor-pointer"
-              title="Open Recipe Admin Preview"
+            {/* Admin CMS Dashboard */}
+            <Link
+              href="/admin"
+              className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-sky-50 text-sky-900 border border-sky-300 hover:bg-sky-100 transition-colors"
+              title="Open Backend CMS & Fridge Arranger"
             >
-              <BookPlus className="w-3 h-3 text-amber-700" />
-              <span>Notebook</span>
-            </button>
+              <Settings className="w-3 h-3 text-sky-700" />
+              <span>Admin CMS</span>
+            </Link>
           </div>
         </div>
 

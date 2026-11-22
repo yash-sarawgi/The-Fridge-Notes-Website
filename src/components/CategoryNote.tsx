@@ -67,7 +67,7 @@ export const CategoryNote: React.FC<CategoryNoteProps> = ({
       }`}
       style={{
         backgroundColor: category.color,
-        transform: `rotate(${category.rotation}deg)`,
+        transform: `rotate(${category.rotation}deg) scale(${category.scale || 1})`,
       }}
       aria-label={`Category: ${category.name}, ${recipeCount} recipes. Click to open.`}
     >

@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Recipe, Category } from "@/types";
+import { Recipe, Category, FridgeSettings } from "@/types";
 import { initialCategories } from "@/data/categories";
 import { initialRecipes } from "@/data/recipes";
 import { siteConfig } from "@/config/siteConfig";
+import { fetchFridgeData, defaultFridgeSettings } from "@/lib/supabase/api";
 import { CategoryNote } from "./CategoryNote";
 import { DishNote } from "./DishNote";
 import { RecipeSheet } from "./RecipeSheet";
@@ -22,6 +23,7 @@ export const Refrigerator: React.FC = () => {
   // Data State
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
+  const [settings, setSettings] = useState<FridgeSettings>(defaultFridgeSettings);
 
   // Filtering & Search
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,19 +35,19 @@ export const Refrigerator: React.FC = () => {
   // Admin Modal
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
-  // Load custom recipes from localStorage
+  // Load live data from Supabase (or localStorage fallback)
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("fridge_notes_custom_recipes");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setRecipes(parsed);
-        }
+    let mounted = true;
+    fetchFridgeData().then((data) => {
+      if (mounted) {
+        if (data.categories && data.categories.length > 0) setCategories(data.categories);
+        if (data.recipes && data.recipes.length > 0) setRecipes(data.recipes);
+        if (data.settings) setSettings(data.settings);
       }
-    } catch {
-      // ignore
-    }
+    });
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const persistRecipes = (updated: Recipe[]) => {
@@ -215,7 +217,7 @@ export const Refrigerator: React.FC = () => {
             <div className="px-4 py-1 sm:px-5 sm:py-1.5 rounded-full chrome-finish border-2 border-slate-300 shadow-xl flex items-center gap-1.5">
               <Sparkles className="w-3 h-3 text-amber-500 fill-amber-400 flex-shrink-0" />
               <span className="font-heading tracking-[0.2em] text-xs sm:text-sm uppercase font-extrabold text-slate-800 whitespace-nowrap drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]">
-                {siteConfig.fridgeBadgeText}
+                {settings.badgeText}
               </span>
               <Sparkles className="w-3 h-3 text-amber-500 fill-amber-400 flex-shrink-0" />
             </div>
@@ -274,10 +276,10 @@ export const Refrigerator: React.FC = () => {
               <Magnet color="#dc2626" size="sm" shape="round" />
             </div>
             <p className="font-handwriting text-sm sm:text-base font-bold leading-tight text-amber-950">
-              &ldquo;{siteConfig.tagline}&rdquo;
+              &ldquo;{settings.tagline}&rdquo;
             </p>
             <p className="font-handwriting text-[11px] sm:text-xs text-amber-900/90 leading-snug mt-0.5 max-w-[210px] mx-auto">
-              {siteConfig.subIntro}
+              {settings.subIntro}
             </p>
           </div>
         </div>
@@ -296,7 +298,7 @@ export const Refrigerator: React.FC = () => {
             <div className="absolute -top-2 right-1">
               <Magnet color="#ef4444" size="sm" shape="heart" />
             </div>
-            <span>Butter! 🧈</span>
+            <span>{settings.butterNoteText}</span>
           </div>
         </div>
 
@@ -430,7 +432,7 @@ export const Refrigerator: React.FC = () => {
           }}
         >
           <div className="relative px-2 py-1 bg-rose-100 text-rose-950 font-handwriting text-[10px] sm:text-xs font-bold rounded shadow-sm border border-rose-200 whitespace-nowrap text-center">
-            &ldquo;Good food = Good mood&rdquo; 🍓
+            &ldquo;{settings.moodNoteText}&rdquo;
             <div className="absolute -top-1.5 right-1">
               <Magnet color="#ec4899" size="sm" shape="heart" />
             </div>
