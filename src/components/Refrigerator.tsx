@@ -8,7 +8,6 @@ import { initialCategories } from "@/data/categories";
 import { initialRecipes } from "@/data/recipes";
 import { siteConfig } from "@/config/siteConfig";
 import { SmegBadge } from "./SmegBadge";
-import { SmegHandle } from "./SmegHandle";
 import { CategoryNote } from "./CategoryNote";
 import { DishNote } from "./DishNote";
 import { RecipeSheet } from "./RecipeSheet";
@@ -16,19 +15,14 @@ import { KitchenWhiteboard } from "./KitchenWhiteboard";
 import { AdminModal } from "./AdminModal";
 import { Magnet } from "./Magnet";
 import { playMagnetClick, playPaperRustle } from "@/utils/audio";
-import { ArrowLeft, ZoomOut, ZoomIn, Palette, Sparkles, ChefHat } from "lucide-react";
-
-type FridgeColor = "blue" | "cream" | "mint" | "pink";
+import { ArrowLeft, ZoomOut, ZoomIn, Sparkles, ChefHat } from "lucide-react";
 
 export const Refrigerator: React.FC = () => {
   // Camera & View Mode
-  // "zoomed-out" shows the complete kitchen scene from the reference photo.
+  // "zoomed-out" shows the complete kitchen photo from your reference image.
   // "zoomed-in" zooms directly into the refrigerator, enabling natural scrolling down the doors.
   const [zoomMode, setZoomMode] = useState<"zoomed-out" | "zoomed-in">("zoomed-out");
   const [hasAutoZoomed, setHasAutoZoomed] = useState(false);
-
-  // Refrigerator Color Theme (defaulting to the iconic Retro Blue from the user's reference photo!)
-  const [fridgeColor, setFridgeColor] = useState<FridgeColor>("blue");
 
   // Navigation State
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
@@ -48,17 +42,17 @@ export const Refrigerator: React.FC = () => {
   // Admin Modal
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
-  // Ref to scroll container
-  const fridgeContainerRef = useRef<HTMLDivElement>(null);
+  // Ref to fridge top for scrolling
+  const fridgeTopRef = useRef<HTMLDivElement>(null);
 
   // 1. Automatic Entrance Animation:
-  // Starts in zoomed-out kitchen view, then smoothly zooms into the freezer door!
+  // Starts with the full zoomed-out kitchen photo, then smoothly zooms into the fridge!
   useEffect(() => {
     const timer = setTimeout(() => {
       setZoomMode("zoomed-in");
       setHasAutoZoomed(true);
       playMagnetClick(soundEnabled);
-    }, 1400);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [soundEnabled]);
@@ -115,10 +109,6 @@ export const Refrigerator: React.FC = () => {
     playMagnetClick(soundEnabled);
     setSelectedCategoryId(catId);
     setSelectedRecipe(null);
-    // Smooth scroll down to main notes area if needed
-    if (fridgeContainerRef.current) {
-      fridgeContainerRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
   };
 
   const handleBackToCategories = () => {
@@ -202,83 +192,41 @@ export const Refrigerator: React.FC = () => {
 
   const selectedCategoryObj = categories.find((c) => c.id === selectedCategoryId);
 
-  // Dynamic enamel class based on user chosen retro color
-  const getEnamelClass = () => {
-    switch (fridgeColor) {
-      case "cream":
-        return "fridge-enamel-cream text-[#2a1d15]";
-      case "mint":
-        return "fridge-enamel-mint text-[#173029]";
-      case "pink":
-        return "fridge-enamel-pink text-[#351824]";
-      default:
-        // Retro blue matching reference image
-        return "fridge-enamel-blue text-white";
-    }
-  };
-
   return (
     <div className="relative min-h-screen w-full bg-[#18110b] overflow-x-hidden select-none">
       
       {/* ============================================================== */}
-      {/* FLOATING CAMERA CONTROL BAR (ZOOM OUT / ZOOM IN & COLOR PICKER)*/}
+      {/* FLOATING CAMERA CONTROL BAR                                    */}
       {/* ============================================================== */}
       <header className="fixed top-3 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8 pointer-events-none">
         
         {/* Brand Tag Pill */}
-        <div className="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-white shadow-lg">
-          <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+        <div className="pointer-events-auto flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/20 text-white shadow-xl">
+          <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-pulse" />
           <span className="font-heading tracking-widest text-xs uppercase font-extrabold">
             {siteConfig.name}
           </span>
         </div>
 
-        {/* Camera Zoom Toggle & Color Swatches */}
+        {/* Camera Zoom Toggle Button */}
         <div className="pointer-events-auto flex items-center gap-2">
-          
-          {/* Color Switcher */}
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20 shadow-lg">
-            <Palette className="w-3.5 h-3.5 text-white/80 mr-1" />
-            <button
-              onClick={() => { setFridgeColor("blue"); playMagnetClick(soundEnabled); }}
-              className={`w-4 h-4 rounded-full bg-sky-400 border transition-transform ${fridgeColor === "blue" ? "scale-125 border-white ring-2 ring-white/50" : "border-black/30 hover:scale-110"}`}
-              title="Retro Sky Blue (Original SMEG)"
-            />
-            <button
-              onClick={() => { setFridgeColor("cream"); playMagnetClick(soundEnabled); }}
-              className={`w-4 h-4 rounded-full bg-[#f6efe1] border transition-transform ${fridgeColor === "cream" ? "scale-125 border-white ring-2 ring-white/50" : "border-black/30 hover:scale-110"}`}
-              title="Vintage Ivory Cream"
-            />
-            <button
-              onClick={() => { setFridgeColor("mint"); playMagnetClick(soundEnabled); }}
-              className={`w-4 h-4 rounded-full bg-emerald-300 border transition-transform ${fridgeColor === "mint" ? "scale-125 border-white ring-2 ring-white/50" : "border-black/30 hover:scale-110"}`}
-              title="Retro Mint Sage"
-            />
-            <button
-              onClick={() => { setFridgeColor("pink"); playMagnetClick(soundEnabled); }}
-              className={`w-4 h-4 rounded-full bg-pink-300 border transition-transform ${fridgeColor === "pink" ? "scale-125 border-white ring-2 ring-white/50" : "border-black/30 hover:scale-110"}`}
-              title="Pastel Dusty Pink"
-            />
-          </div>
-
-          {/* Zoom Toggle Button */}
           <button
             onClick={() => {
               playMagnetClick(soundEnabled);
               setZoomMode(zoomMode === "zoomed-out" ? "zoomed-in" : "zoomed-out");
             }}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500 hover:bg-amber-400 text-stone-950 font-semibold text-xs transition-transform duration-200 hover:scale-105 active:scale-95 shadow-lg border border-amber-300 cursor-pointer"
-            title={zoomMode === "zoomed-out" ? "Zoom into Refrigerator" : "Zoom out to Full Kitchen"}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs sm:text-sm transition-transform duration-200 hover:scale-105 active:scale-95 shadow-xl border border-amber-300 cursor-pointer"
+            title={zoomMode === "zoomed-out" ? "Step closer to Refrigerator" : "Step back to Full Kitchen"}
           >
             {zoomMode === "zoomed-out" ? (
               <>
                 <ZoomIn className="w-4 h-4" />
-                <span>Zoom In to Fridge</span>
+                <span>Step Closer to Fridge ➔</span>
               </>
             ) : (
               <>
                 <ZoomOut className="w-4 h-4" />
-                <span>Zoom Out to Kitchen</span>
+                <span>🔍 View Full Kitchen</span>
               </>
             )}
           </button>
@@ -286,360 +234,360 @@ export const Refrigerator: React.FC = () => {
       </header>
 
       {/* ============================================================== */}
-      {/* COMPLETE RETRO KITCHEN SCENE (INSPIRED DIRECTLY BY ATTACHED PHOTO) */}
+      {/* VIEWPORT PRESENTATION                                          */}
       {/* ============================================================== */}
-      <div className="relative w-full min-h-screen flex flex-col items-center justify-start overflow-hidden">
+      <AnimatePresence mode="wait">
         
-        {/* A. Warm Terracotta / Orange Upper Wall */}
-        <div className="absolute top-0 left-0 right-0 h-[380px] kitchen-orange-wall z-0" />
-
-        {/* B. Retro Wall Shelves with Cactus Pots & Glass Jars (matching the photo!) */}
-        <div className="absolute top-14 left-0 right-0 max-w-6xl mx-auto flex items-center justify-between px-6 sm:px-12 z-1 pointer-events-none opacity-90">
-          
-          {/* Left Wooden Shelf */}
-          <div className="flex flex-col items-start w-52 sm:w-64">
-            <div className="flex items-end gap-3 px-3 pb-1">
-              <div className="w-6 h-10 rounded-t-sm bg-sky-200/60 border border-sky-300/40 shadow-xs" />
-              <div className="w-10 h-7 rounded-sm bg-sky-400/80 shadow-xs flex items-center justify-center text-[10px]">
-                🥣
-              </div>
-              <div className="w-8 h-12 rounded-t-md bg-stone-100/50 border border-white/40 shadow-xs" />
-            </div>
-            {/* Wooden shelf board */}
-            <div className="w-full h-3.5 rounded-xs bg-[#935835] border-t border-[#b67852] shadow-md" />
-          </div>
-
-          {/* Right Wooden Shelf with Potted Cacti & Storage Jars */}
-          <div className="flex flex-col items-end w-52 sm:w-64">
-            <div className="flex items-end gap-3 px-3 pb-1">
-              <div className="flex flex-col items-center">
-                <span className="text-sm">🌵</span>
-                <div className="w-6 h-5 rounded-sm bg-sky-400 shadow-xs" />
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-xs">🌵</span>
-                <div className="w-5 h-4 rounded-sm bg-sky-400 shadow-xs" />
-              </div>
-              <div className="w-7 h-11 rounded-t-md bg-amber-100/60 border border-amber-200/40 shadow-xs" />
-            </div>
-            {/* Wooden shelf board */}
-            <div className="w-full h-3.5 rounded-xs bg-[#935835] border-t border-[#b67852] shadow-md" />
-          </div>
-        </div>
-
-        {/* C. White Ceramic Tile Backsplash */}
-        <div className="absolute top-[280px] left-0 right-0 h-[420px] kitchen-tile-backsplash z-0" />
-
-        {/* D. Retro Fluted Orange Cabinets on Left & Right with Stone Countertops & Oranges */}
-        <div className="absolute top-[360px] left-0 right-0 max-w-6xl mx-auto flex justify-between px-4 sm:px-8 z-1 pointer-events-none">
-          
-          {/* Left Cabinet with Bowl of Fresh Oranges */}
-          <div className="relative w-44 sm:w-64 flex flex-col items-center">
-            {/* Bowl of fresh oranges on countertop */}
-            <div className="relative -mb-1 flex items-center justify-center">
-              <div className="w-16 h-8 rounded-b-full bg-sky-400 border border-sky-300 shadow-md flex items-center justify-center">
-                <span className="text-base -mt-4">🍊🍊🍊</span>
-              </div>
-            </div>
-            {/* Grey stone countertop */}
-            <div className="w-full h-4 rounded-xs bg-[#c9d1d9] border-t border-white shadow-md" />
-            {/* Fluted orange cabinet body with vertical slats */}
-            <div className="w-full h-72 sm:h-80 bg-gradient-to-r from-[#e66c30] via-[#ea783e] to-[#df6427] rounded-b-md shadow-xl border-t border-black/20 p-2 flex justify-around">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="w-2.5 h-full rounded-full bg-black/10 border-r border-white/20" />
-              ))}
-            </div>
-          </div>
-
-          {/* Right Cabinet with Cutting Board & Blue Bowl */}
-          <div className="relative w-44 sm:w-64 flex flex-col items-center">
-            {/* Cutting board and fruit */}
-            <div className="relative -mb-1 flex items-center gap-2">
-              <div className="w-8 h-10 rounded-t-sm bg-[#c28456] border border-[#d89c6f] shadow-xs rotate-6" />
-              <div className="w-16 h-8 rounded-b-full bg-sky-400 border border-sky-300 shadow-md flex items-center justify-center">
-                <span className="text-base -mt-4">🍊🍊</span>
-              </div>
-            </div>
-            {/* Grey stone countertop */}
-            <div className="w-full h-4 rounded-xs bg-[#c9d1d9] border-t border-white shadow-md" />
-            {/* Fluted orange cabinet body */}
-            <div className="w-full h-72 sm:h-80 bg-gradient-to-r from-[#df6427] via-[#ea783e] to-[#e66c30] rounded-b-md shadow-xl border-t border-black/20 p-2 flex justify-around">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="w-2.5 h-full rounded-full bg-black/10 border-r border-white/20" />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* E. Herringbone / Chevron Parquet Floor at the bottom */}
-        <div className="absolute top-[680px] bottom-0 left-0 right-0 min-h-[500px] kitchen-herringbone-floor z-0" />
-
-        {/* ============================================================== */}
-        {/* FRAMER MOTION CAMERA RIG & INTERACTIVE REFRIGERATOR            */}
-        {/* ============================================================== */}
-        <motion.div
-          animate={
-            zoomMode === "zoomed-in"
-              ? {
-                  scale: 1,
-                  y: 0,
-                  transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] },
-                }
-              : {
-                  scale: 0.68,
-                  y: 45,
-                  transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
-                }
-          }
-          className="relative z-10 w-full max-w-[880px] sm:max-w-[940px] mx-auto pt-16 sm:pt-20 pb-28 px-3 sm:px-6 flex flex-col items-center origin-top"
-        >
-          {/* Refrigerator Master Body (1950s SMEG-Style Curved Pill Appliance) */}
-          <div
-            ref={fridgeContainerRef}
-            className={`relative w-full rounded-[48px] sm:rounded-[60px] smeg-fridge-body ${getEnamelClass()} flex flex-col overflow-hidden pb-10 transition-colors duration-500`}
-            style={{
-              minHeight: "1180px",
-            }}
+        {/* ============================================================ */}
+        {/* 1. ZOOMED-OUT FULL KITCHEN SCENE (EXACT PHOTO FROM REFERENCE) */}
+        {/* ============================================================ */}
+        {zoomMode === "zoomed-out" ? (
+          <motion.div
+            key="zoomed-out-kitchen"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.15 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="relative min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-8"
           >
-            
-            {/* ============================================================ */}
-            {/* 1. UPPER FREEZER DOOR                                        */}
-            {/* ============================================================ */}
-            <div className="relative w-full pt-8 pb-10 px-6 sm:px-12 flex flex-col items-center">
-              
-              {/* Authentic 3D Chrome Spaced Lettering: "F R I D G E   N O T E S" */}
-              <SmegBadge
-                onClick={() => {
-                  playMagnetClick(soundEnabled);
-                  if (fridgeContainerRef.current) {
-                    fridgeContainerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }
-                }}
-                className="mb-4"
+            {/* Ambient Background Glow matching the kitchen photo */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#e86b2e]/30 via-transparent to-[#1a110a] pointer-events-none" />
+
+            {/* The Actual Real Photograph with Mapped Fridge Notes */}
+            <div
+              onClick={() => {
+                setZoomMode("zoomed-in");
+                playMagnetClick(soundEnabled);
+              }}
+              className="group relative w-full max-w-[736px] aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-black/40 cursor-pointer"
+              title="Click to zoom in to the refrigerator!"
+            >
+              {/* The Real Kitchen Image (with SMEG text cleanly inpainted) */}
+              <Image
+                src="/images/smeg-fridge-clean.jpg"
+                alt="Cozy retro kitchen with vintage refrigerator"
+                fill
+                priority
+                className="object-cover transition-transform duration-700 group-hover:scale-102"
               />
 
-              {/* Handwritten Introduction Sticky Note pinned with 3D magnet */}
+              {/* Mapped Fridge Door Surface Area (Exact coordinates on 736x736 image) */}
+              {/* Left: 41.3%, Top: 16.2%, Width: 40.4%, Height: 69.4% */}
               <div
-                className="relative mt-2 px-6 py-3 bg-[#fefce8] text-[#2c1d11] rounded-sm paper-shadow-md border border-amber-200 max-w-md text-center transform -rotate-1 transition-transform duration-200 hover:rotate-0"
+                className="absolute"
                 style={{
-                  clipPath: "polygon(0 0, 100% 0.5%, 99.5% 99.5%, 0.5% 100%)",
+                  left: "41.3%",
+                  top: "16.2%",
+                  width: "40.4%",
+                  height: "69.4%",
                 }}
               >
-                {/* 3D Magnet */}
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20">
-                  <Magnet color="#dc2626" size="md" shape="round" />
+                {/* 3D Chrome Emblem: "THE FRIDGE NOTES" (Replaces SMEG on the freezer door) */}
+                <div className="absolute top-[8%] left-1/2 -translate-x-1/2 w-4/5 text-center pointer-events-none">
+                  <span
+                    className="font-heading font-black text-xs sm:text-sm tracking-[0.2em] uppercase text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                    style={{
+                      background: "linear-gradient(180deg, #ffffff 0%, #cbd5e1 50%, #64748b 52%, #e2e8f0 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >
+                    THE FRIDGE NOTES
+                  </span>
                 </div>
 
-                <p className="font-handwriting text-xl sm:text-2xl font-bold leading-tight text-amber-950">
-                  &ldquo;{siteConfig.tagline}&rdquo;
-                </p>
-                <p className="font-handwriting text-sm sm:text-base text-amber-900/90 leading-snug mt-1">
-                  {siteConfig.subIntro}
-                </p>
+                {/* Handwritten Intro Sticky Note on Freezer */}
+                <div
+                  className="absolute top-[22%] left-1/2 -translate-x-1/2 w-[72%] p-2 bg-[#fefce8] text-[#2c1d11] rounded-xs paper-shadow-md border border-amber-200 transform -rotate-1 text-center pointer-events-none"
+                  style={{
+                    boxShadow: "0 4px 8px rgba(0,0,0,0.35)",
+                  }}
+                >
+                  <div className="absolute -top-2 left-1/2 -translate-x-1/2">
+                    <Magnet color="#dc2626" size="sm" shape="round" />
+                  </div>
+                  <p className="font-handwriting text-[10px] sm:text-xs font-bold leading-tight text-amber-950">
+                    &ldquo;{siteConfig.tagline}&rdquo;
+                  </p>
+                </div>
+
+                {/* A few sample mini sticky notes on the lower door */}
+                <div className="absolute top-[52%] left-[12%] w-[38%] p-1.5 bg-[#fef08a] rounded-xs shadow-md border border-amber-300 transform -rotate-3 text-center pointer-events-none">
+                  <div className="absolute -top-1.5 left-2">
+                    <Magnet color="#0284c7" size="sm" />
+                  </div>
+                  <span className="font-handwriting text-[9px] font-bold text-amber-950 block truncate">
+                    🥪 Sandwiches
+                  </span>
+                </div>
+
+                <div className="absolute top-[55%] right-[10%] w-[38%] p-1.5 bg-[#fbcfe8] rounded-xs shadow-md border border-pink-300 transform rotate-2 text-center pointer-events-none">
+                  <div className="absolute -top-1.5 right-2">
+                    <Magnet color="#eab308" size="sm" />
+                  </div>
+                  <span className="font-handwriting text-[9px] font-bold text-pink-950 block truncate">
+                    🍰 Desserts
+                  </span>
+                </div>
+
+                <div className="absolute top-[72%] left-[22%] w-[55%] p-1.5 bg-[#bbf7d0] rounded-xs shadow-md border border-emerald-300 transform -rotate-1 text-center pointer-events-none">
+                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2">
+                    <Magnet color="#8b5cf6" size="sm" />
+                  </div>
+                  <span className="font-handwriting text-[9px] font-bold text-emerald-950 block truncate">
+                    🍪 9 Categories Pinned
+                  </span>
+                </div>
               </div>
 
-              {/* Streamlined Chrome Wing Handle for the Freezer (Bottom-Left of Freezer Door) */}
-              <div className="absolute bottom-3 left-4 sm:left-8 z-30">
-                <SmegHandle
-                  onClick={() => playMagnetClick(soundEnabled)}
-                  title="Freezer door handle"
-                />
-              </div>
-
-              {/* Ambient Cute Freezer Magnets */}
-              <div className="hidden lg:block absolute top-10 right-14 pointer-events-none transform rotate-3">
-                <div className="px-3 py-1 bg-rose-100 text-rose-950 font-handwriting text-xs rounded shadow-xs border border-rose-200">
-                  <span>Don&apos;t forget butter!</span> 🧈
-                </div>
-                <div className="absolute -top-2 right-4">
-                  <Magnet color="#ef4444" size="sm" shape="heart" />
-                </div>
+              {/* Welcoming Overlay Cue */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-5 py-2 rounded-full bg-black/75 backdrop-blur-md text-white text-xs font-bold flex items-center gap-2 border border-white/20 shadow-xl group-hover:bg-amber-500 group-hover:text-stone-950 transition-colors">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Click anywhere to step into the fridge</span>
               </div>
             </div>
+          </motion.div>
+        ) : (
+          
+          /* ============================================================ */
+          /* 2. ZOOMED-IN FOCUSED REFRIGERATOR (SCROLLABLE DOWN THE DOOR) */
+          /* ============================================================ */
+          <motion.div
+            key="zoomed-in-fridge"
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="relative min-h-screen w-full flex flex-col items-center justify-start pt-16 pb-28 px-2 sm:px-6"
+          >
+            {/* Atmospheric Blurred Kitchen Photo as Room Backdrop */}
+            <div
+              className="fixed inset-0 z-0 bg-cover bg-center"
+              style={{
+                backgroundImage: "url('/images/smeg-fridge-clean.jpg')",
+                filter: "blur(4px) brightness(0.65)",
+                transform: "scale(1.05)",
+              }}
+            />
 
-            {/* ============================================================ */}
-            {/* 2. POLISHED CHROME SEAM DIVIDER BETWEEN DOORS               */}
-            {/* ============================================================ */}
-            <div className="relative w-full h-3 sm:h-3.5 smeg-chrome-divider z-20 my-1" />
-
-            {/* ============================================================ */}
-            {/* 3. LOWER MAIN REFRIGERATOR DOOR                              */}
-            {/* ============================================================ */}
-            <div className="relative w-full flex-1 pt-6 pb-12 flex flex-col justify-start">
+            {/* Main Interactive Refrigerator Container */}
+            {/* Uses the real cropped SMEG refrigerator image for 100% photorealistic realism */}
+            <div
+              ref={fridgeTopRef}
+              className="relative z-10 w-full max-w-[740px] mx-auto rounded-[46px] sm:rounded-[56px] overflow-hidden shadow-2xl border-4 border-black/40 flex flex-col"
+              style={{
+                boxShadow: "0 25px 60px -10px rgba(0,0,0,0.7), 0 35px 80px rgba(0,0,0,0.5)",
+              }}
+            >
               
-              {/* Streamlined Chrome Wing Handle for the Main Fridge (Top-Left of Lower Door) */}
-              <div className="absolute top-2 left-4 sm:left-8 z-30">
-                <SmegHandle
-                  onClick={() => playMagnetClick(soundEnabled)}
-                  title="Main refrigerator door handle"
-                />
-              </div>
-
-              {/* Dry-Erase Kitchen Whiteboard Strip (Search & Filters) */}
-              <div className="pt-8 sm:pt-4 px-2 sm:px-6">
-                <KitchenWhiteboard
-                  searchQuery={searchQuery}
-                  onSearchChange={(q) => {
-                    setSearchQuery(q);
-                    if (q.trim()) {
-                      setSelectedRecipe(null);
-                    }
-                  }}
-                  activeFilter={activeFilter}
-                  onFilterChange={(f) => {
-                    setActiveFilter(f);
-                    playMagnetClick(soundEnabled);
-                  }}
-                  soundEnabled={soundEnabled}
-                  onToggleSound={() => {
-                    setSoundEnabled(!soundEnabled);
-                    playMagnetClick(!soundEnabled);
-                  }}
-                  onOpenAdmin={() => setIsAdminOpen(true)}
-                  totalRecipesCount={recipes.length}
-                  currentDisplayCount={displayedRecipes.length}
-                />
-              </div>
-
-              {/* Ambient Decorative Note on Main Door */}
-              <div className="hidden lg:block absolute bottom-8 right-12 z-10 pointer-events-none transform rotate-2">
-                <div className="px-3 py-1 bg-yellow-100 text-amber-950 font-handwriting text-xs rounded shadow-xs border border-amber-300">
-                  &ldquo;Good food = Good mood&rdquo; 🍓
-                </div>
-                <div className="absolute -top-2 right-4">
-                  <Magnet color="#10b981" size="sm" shape="round" />
-                </div>
-              </div>
-
-              {/* ========================================================== */}
-              {/* INTERACTIVE DOOR SURFACE (CATEGORIES / DISHES / RECIPES)   */}
-              {/* ========================================================== */}
-              <div className="relative w-full flex-1 px-4 sm:px-8 lg:px-12 py-5 z-20 flex flex-col justify-start">
+              {/* ======================================================== */}
+              {/* UPPER FREEZER DOOR (REAL PHOTOGRAPHIC TEXTURE & HANDLES) */}
+              {/* ======================================================== */}
+              <div className="relative w-full aspect-[630/425] flex flex-col items-center justify-start pt-6 sm:pt-8 px-6 overflow-hidden">
                 
-                {/* VIEW 1: EXPANDED RECIPE VIEW (STAYS MOUNTED ON THE FRIDGE) */}
-                {selectedRecipe ? (
-                  <RecipeSheet
-                    recipe={selectedRecipe}
-                    onClose={handleCloseRecipe}
-                    onToggleFavorite={(id) => handleToggleFavorite(id)}
-                    soundEnabled={soundEnabled}
+                {/* Real Photographic Freezer Door Texture */}
+                <Image
+                  src="/images/smeg-fridge-door.jpg"
+                  alt="Retro refrigerator freezer door"
+                  fill
+                  priority
+                  className="object-cover object-top pointer-events-none"
+                />
+
+                {/* 3D Chrome Block Lettering: "F R I D G E   N O T E S" */}
+                <div className="relative z-20 mt-2 mb-3">
+                  <SmegBadge
+                    onClick={() => {
+                      playMagnetClick(soundEnabled);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                   />
-                ) : selectedCategoryId || searchQuery ? (
+                </div>
+
+                {/* Handwritten Introduction Note Pinned on Freezer Door */}
+                <div
+                  className="relative z-20 px-6 py-3 bg-[#fefce8] text-[#2c1d11] rounded-sm paper-shadow-md border border-amber-200 max-w-md text-center transform -rotate-1 transition-transform hover:rotate-0"
+                  style={{
+                    clipPath: "polygon(0 0, 100% 0.5%, 99.5% 99.5%, 0.5% 100%)",
+                  }}
+                >
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-30">
+                    <Magnet color="#dc2626" size="md" shape="round" />
+                  </div>
+
+                  <p className="font-handwriting text-xl sm:text-2xl font-bold leading-tight text-amber-950">
+                    &ldquo;{siteConfig.tagline}&rdquo;
+                  </p>
+                  <p className="font-handwriting text-sm sm:text-base text-amber-900/90 leading-snug mt-1">
+                    {siteConfig.subIntro}
+                  </p>
+                </div>
+
+                {/* Cute Ambient Reminder on Freezer */}
+                <div className="hidden sm:block absolute bottom-4 right-8 z-20 pointer-events-none transform rotate-3">
+                  <div className="px-3 py-1 bg-yellow-100 text-amber-950 font-handwriting text-xs rounded shadow-xs border border-amber-300">
+                    <span>Don&apos;t forget butter!</span> 🧈
+                  </div>
+                  <div className="absolute -top-2 right-4">
+                    <Magnet color="#ef4444" size="sm" shape="heart" />
+                  </div>
+                </div>
+              </div>
+
+              {/* ======================================================== */}
+              {/* LOWER MAIN REFRIGERATOR DOOR (SCROLLABLE DOWN AREA)       */}
+              {/* ======================================================== */}
+              <div
+                className="relative w-full flex-1 min-h-[880px] flex flex-col justify-start pb-12 pt-8"
+                style={{
+                  background: "linear-gradient(180deg, #2488cc 0%, #207dbd 25%, #1c72ad 60%, #155d8f 100%)",
+                }}
+              >
+                {/* Chrome seam reflection at top of lower door */}
+                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-b from-black/35 to-transparent pointer-events-none" />
+
+                {/* Dry-Erase Kitchen Whiteboard Strip (Search & Filters) */}
+                <div className="relative z-20 px-3 sm:px-6 mb-4">
+                  <KitchenWhiteboard
+                    searchQuery={searchQuery}
+                    onSearchChange={(q) => {
+                      setSearchQuery(q);
+                      if (q.trim()) {
+                        setSelectedRecipe(null);
+                      }
+                    }}
+                    activeFilter={activeFilter}
+                    onFilterChange={(f) => {
+                      setActiveFilter(f);
+                      playMagnetClick(soundEnabled);
+                    }}
+                    soundEnabled={soundEnabled}
+                    onToggleSound={() => {
+                      setSoundEnabled(!soundEnabled);
+                      playMagnetClick(!soundEnabled);
+                    }}
+                    onOpenAdmin={() => setIsAdminOpen(true)}
+                    totalRecipesCount={recipes.length}
+                    currentDisplayCount={displayedRecipes.length}
+                  />
+                </div>
+
+                {/* ====================================================== */}
+                {/* MAIN DOOR INTERACTIVE SURFACE                          */}
+                {/* ====================================================== */}
+                <div className="relative z-20 w-full flex-1 px-4 sm:px-8 py-3 flex flex-col justify-start">
                   
-                  /* VIEW 2: SELECTED CATEGORY DISHES ON THE SAME REFRIGERATOR */
-                  <div className="w-full flex flex-col items-center space-y-6">
+                  {/* VIEW 1: EXPANDED RECIPE SHEET (MOUNTED ON THE FRIDGE) */}
+                  {selectedRecipe ? (
+                    <RecipeSheet
+                      recipe={selectedRecipe}
+                      onClose={handleCloseRecipe}
+                      onToggleFavorite={(id) => handleToggleFavorite(id)}
+                      soundEnabled={soundEnabled}
+                    />
+                  ) : selectedCategoryId || searchQuery ? (
                     
-                    {/* Physical Handwritten Navigation Back Note pinned to fridge */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 w-full max-w-4xl px-2">
-                      <button
-                        onClick={handleBackToCategories}
-                        onMouseEnter={handleHoverNote}
-                        className="group relative cursor-pointer px-5 py-2.5 bg-[#fefce8] text-amber-950 rounded-sm paper-shadow-md border border-amber-200 transform -rotate-1 hover:rotate-0 hover:-translate-y-1 transition-all flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-amber-500"
-                        aria-label="Back to all categories"
-                      >
-                        <div className="absolute -top-2.5 left-4 z-20">
-                          <Magnet color="#ef4444" size="sm" />
-                        </div>
-                        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-amber-800" />
-                        <span className="font-handwriting text-lg font-bold">
-                          ← Back to all category notes
-                        </span>
-                      </button>
-
-                      {/* Category Title Note */}
-                      <div className="relative px-4 py-1.5 bg-white/90 rounded-full border border-stone-300 shadow-xs flex items-center gap-2 text-stone-900">
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: selectedCategoryObj?.magnetColor || "#ef4444" }} />
-                        <span className="font-handwriting text-lg font-bold">
-                          {searchQuery
-                            ? `Search results for "${searchQuery}"`
-                            : `${selectedCategoryObj?.name || "Dishes"} (${displayedRecipes.length})`}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Dish Notes Grid (Organically arranged on the fridge door) */}
-                    {displayedRecipes.length === 0 ? (
-                      <div className="py-20 text-center space-y-3">
-                        <div className="text-4xl">🍳</div>
-                        <p className="font-handwriting text-2xl font-bold text-white drop-shadow-md">
-                          No recipe notes match this search.
-                        </p>
+                    /* VIEW 2: SELECTED CATEGORY DISHES ON THE FRIDGE DOOR */
+                    <div className="w-full flex flex-col items-center space-y-6">
+                      
+                      {/* Physical Navigation Back Note */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 w-full max-w-3xl px-2">
                         <button
-                          onClick={() => {
-                            setSearchQuery("");
-                            setActiveFilter("all");
-                          }}
-                          className="px-5 py-2 rounded-full bg-amber-900 text-white font-handwriting text-base font-bold hover:bg-amber-800 cursor-pointer shadow-sm"
+                          onClick={handleBackToCategories}
+                          onMouseEnter={handleHoverNote}
+                          className="group relative cursor-pointer px-5 py-2.5 bg-[#fefce8] text-amber-950 rounded-sm paper-shadow-md border border-amber-200 transform -rotate-1 hover:rotate-0 hover:-translate-y-1 transition-all flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-amber-500"
+                          aria-label="Back to all categories"
                         >
-                          Show all dishes
+                          <div className="absolute -top-2.5 left-4 z-20">
+                            <Magnet color="#ef4444" size="sm" />
+                          </div>
+                          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform text-amber-800" />
+                          <span className="font-handwriting text-lg font-bold">
+                            ← Back to all category notes
+                          </span>
                         </button>
-                      </div>
-                    ) : (
-                      <div className="w-full flex flex-wrap items-start justify-center gap-6 sm:gap-7 lg:gap-8 pt-4 pb-12">
-                        {displayedRecipes.map((dish) => (
-                          <DishNote
-                            key={dish.id}
-                            recipe={dish}
-                            onClick={() => handleClickRecipe(dish)}
-                            onHover={handleHoverNote}
-                            onToggleFavorite={(e) => handleToggleFavorite(dish.id, e)}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  
-                  /* VIEW 3: HOMEPAGE CATEGORY NOTES (ORGANICALLY ASSEMBLED ON THE FRIDGE) */
-                  <div className="w-full flex flex-col items-center">
-                    <div className="text-center mb-6">
-                      <span className="font-handwriting text-lg sm:text-xl text-amber-950 font-bold px-4 py-1.5 bg-amber-100/90 rounded-full border border-amber-300 shadow-md">
-                        ✨ Pick a category sticky note to explore recipes ✨
-                      </span>
-                    </div>
 
-                    {/* Organic Scrapbook Layout for Categories */}
-                    <div className="w-full flex flex-wrap items-center justify-center gap-6 sm:gap-7 lg:gap-8 max-w-4xl pt-2 pb-10">
-                      {categories.map((category) => {
-                        const count = recipes.filter((r) => r.categoryId === category.id).length;
-                        return (
-                          <CategoryNote
-                            key={category.id}
-                            category={category}
-                            recipeCount={count}
-                            onClick={() => handleClickCategory(category.id)}
-                            onHover={handleHoverNote}
-                          />
-                        );
-                      })}
+                        {/* Category Title Note */}
+                        <div className="relative px-4 py-1.5 bg-white/95 rounded-full border border-stone-300 shadow-xs flex items-center gap-2 text-stone-900">
+                          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: selectedCategoryObj?.magnetColor || "#ef4444" }} />
+                          <span className="font-handwriting text-lg font-bold">
+                            {searchQuery
+                              ? `Search results for "${searchQuery}"`
+                              : `${selectedCategoryObj?.name || "Dishes"} (${displayedRecipes.length})`}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Dish Notes Grid (Organically placed on the fridge door) */}
+                      {displayedRecipes.length === 0 ? (
+                        <div className="py-20 text-center space-y-3">
+                          <div className="text-4xl">🍳</div>
+                          <p className="font-handwriting text-2xl font-bold text-white drop-shadow-md">
+                            No recipe notes match this search.
+                          </p>
+                          <button
+                            onClick={() => {
+                              setSearchQuery("");
+                              setActiveFilter("all");
+                            }}
+                            className="px-5 py-2 rounded-full bg-amber-900 text-white font-handwriting text-base font-bold hover:bg-amber-800 cursor-pointer shadow-sm"
+                          >
+                            Show all dishes
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-full flex flex-wrap items-start justify-center gap-6 sm:gap-7 pt-2 pb-10">
+                          {displayedRecipes.map((dish) => (
+                            <DishNote
+                              key={dish.id}
+                              recipe={dish}
+                              onClick={() => handleClickRecipe(dish)}
+                              onHover={handleHoverNote}
+                              onToggleFavorite={(e) => handleToggleFavorite(dish.id, e)}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    
+                    /* VIEW 3: HOMEPAGE CATEGORY NOTES ORGANICALLY MOUNTED ON THE DOOR */
+                    <div className="w-full flex flex-col items-center">
+                      <div className="text-center mb-6">
+                        <span className="font-handwriting text-lg sm:text-xl text-amber-950 font-bold px-4 py-1.5 bg-amber-100/90 rounded-full border border-amber-300 shadow-md">
+                          ✨ Pick a category sticky note to explore recipes ✨
+                        </span>
+                      </div>
+
+                      {/* Organic Scrapbook Layout for Categories */}
+                      <div className="w-full flex flex-wrap items-center justify-center gap-6 sm:gap-7 max-w-2xl pt-2 pb-8">
+                        {categories.map((category) => {
+                          const count = recipes.filter((r) => r.categoryId === category.id).length;
+                          return (
+                            <CategoryNote
+                              key={category.id}
+                              category={category}
+                              recipeCount={count}
+                              onClick={() => handleClickCategory(category.id)}
+                              onHover={handleHoverNote}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Base of the fridge with cylinder feet */}
+                <div className="relative w-full max-w-md mx-auto flex items-center justify-between px-12 mt-auto pt-6">
+                  <div className="w-12 h-5 rounded-b-md smeg-cylinder-foot shadow-lg" />
+                  <div className="w-12 h-5 rounded-b-md smeg-cylinder-foot shadow-lg" />
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* ============================================================ */}
-          {/* 4. CHROME CYLINDER FEET RESTING ON HERRINGBONE FLOOR         */}
-          {/* ============================================================ */}
-          <div className="relative w-full max-w-2xl flex items-center justify-between px-16 sm:px-24 -mt-2 z-20">
-            {/* Left Foot */}
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-6 rounded-b-lg smeg-cylinder-foot" />
-              <div className="w-14 h-1.5 rounded-full bg-black/80" />
-            </div>
-
-            {/* Right Foot */}
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-6 rounded-b-lg smeg-cylinder-foot" />
-              <div className="w-14 h-1.5 rounded-full bg-black/80" />
-            </div>
-          </div>
-
-          {/* Floor Shadow Under Feet */}
-          <div className="w-full max-w-3xl h-7 smeg-floor-shadow -mt-3 z-10" />
-        </motion.div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Frontend Admin Preview Modal */}
       <AdminModal
