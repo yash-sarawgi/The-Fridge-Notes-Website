@@ -27,7 +27,7 @@ export const DishNote: React.FC<DishNoteProps> = ({
       <div
         onClick={onClick}
         onMouseEnter={onHover}
-        className="group relative cursor-pointer transition-all duration-300 ease-out outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-xs bg-[#fdfbf7] p-3 pb-4 paper-shadow-md hover:paper-shadow-lifted hover:-translate-y-2 hover:rotate-0 w-full max-w-[240px] sm:max-w-[260px]"
+        className="group relative cursor-pointer transition-all duration-300 ease-out outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-xs bg-[#fdfbf7] p-3 pb-3.5 paper-shadow-md hover:paper-shadow-lifted hover:-translate-y-2 hover:rotate-0 w-full max-w-[210px] md:max-w-[230px]"
         style={{
           transform: `rotate(${rotation}deg)`,
           border: "1px solid rgba(0,0,0,0.06)",
@@ -108,7 +108,7 @@ export const DishNote: React.FC<DishNoteProps> = ({
     <div
       onClick={onClick}
       onMouseEnter={onHover}
-      className="group relative cursor-pointer transition-all duration-300 ease-out outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm p-4 pt-5 pb-4 paper-shadow-md hover:paper-shadow-lifted hover:-translate-y-2 hover:rotate-0 w-full max-w-[220px] sm:max-w-[240px]"
+      className="group relative cursor-pointer transition-all duration-300 ease-out outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm p-3.5 pt-4.5 pb-3.5 paper-shadow-md hover:paper-shadow-lifted hover:-translate-y-2 hover:rotate-0 w-full max-w-[200px] md:max-w-[220px]"
       style={{
         backgroundColor: recipe.paperColor || "#fef08a",
         transform: `rotate(${rotation}deg)`,
