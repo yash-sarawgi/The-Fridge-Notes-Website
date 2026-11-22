@@ -285,19 +285,16 @@ export default function AdminPage() {
 
   const handleResetArranger = () => {
     if (!window.confirm("Reset note positions to standard 3x3 layout on the fridge?")) return;
-    const reset = categories.map((cat, idx) => {
-      const col = idx % 3;
-      const row = Math.floor(idx / 3);
-      return {
-        ...cat,
-        xPos: 36.5 + col * 9.8,
-        yPos: 50.5 + row * 13.5,
-        scale: 1,
-        rotation: col === 0 ? -2 : col === 1 ? 1 : -1,
-      };
-    });
+    const tilts = [-2.5, 1.8, -3.2, 2.2, -1.5, 1.2, -2.8, 1.5, -2.0];
+    const reset = categories.map((cat, idx) => ({
+      ...cat,
+      displayOrder: idx,
+      scale: 1,
+      rotation: tilts[idx % tilts.length],
+    }));
     setCategories(reset);
-    showToast("Layout reset. Click 'Save Fridge Layout' to apply.");
+    setSettings((prev) => ({ ...prev, notesScale: 1 }));
+    showToast("Layout reset to clean 3x3 defaults. Click 'Save Fridge Layout' to apply.");
   };
 
   // Save Settings

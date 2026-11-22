@@ -12,6 +12,7 @@ export const defaultFridgeSettings: FridgeSettings = {
   butterNoteText: "Butter! 🧈",
   moodNoteText: "Good food = Good mood 🍓",
   defaultAudioEnabled: siteConfig.defaultAudioEnabled,
+  notesScale: 1,
   introNotePos: { x: 48, y: 35.2, scale: 1, rotation: -1 },
   butterNotePos: { x: 60.5, y: 35.5, scale: 1, rotation: 3 },
   moodNotePos: { x: 60, y: 84.5, scale: 1, rotation: 2 },
@@ -307,10 +308,13 @@ export async function saveArrangedLayoutToSupabase(params: {
   }
 
   // Update categories
-  const categoryPromises = params.categories.map((c) =>
+  const categoryPromises = params.categories.map((c, index) =>
     supabase.from("categories").update({
-      x_pos: c.xPos ?? null,
-      y_pos: c.yPos ?? null,
+      display_order: index,
+      name: c.name,
+      description: c.description,
+      color: c.color,
+      magnet_color: c.magnetColor,
       scale: c.scale ?? 1,
       rotation: c.rotation ?? 0,
       updated_at: new Date().toISOString(),

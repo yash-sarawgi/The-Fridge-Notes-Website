@@ -403,19 +403,27 @@ export const Refrigerator: React.FC = () => {
               </div>
 
               {/* Strict 3-Column Grid: 9 notes in 3 rows fits cleanly on the door! */}
-              <div className="w-full grid grid-cols-3 gap-2 sm:gap-2.5 justify-items-center pt-1">
-                {categories.map((category) => {
-                  const count = recipes.filter((r) => r.categoryId === category.id).length;
-                  return (
-                    <CategoryNote
-                      key={category.id}
-                      category={category}
-                      recipeCount={count}
-                      onClick={() => handleClickCategory(category.id)}
-                      onHover={handleHoverNote}
-                    />
-                  );
-                })}
+              <div
+                className="w-full grid grid-cols-3 gap-2 sm:gap-2.5 justify-items-center pt-1 transition-transform"
+                style={{
+                  transform: `scale(${settings.notesScale || 1})`,
+                  transformOrigin: "top center",
+                }}
+              >
+                {[...categories]
+                  .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+                  .map((category) => {
+                    const count = recipes.filter((r) => r.categoryId === category.id).length;
+                    return (
+                      <CategoryNote
+                        key={category.id}
+                        category={category}
+                        recipeCount={count}
+                        onClick={() => handleClickCategory(category.id)}
+                        onHover={handleHoverNote}
+                      />
+                    );
+                  })}
               </div>
             </div>
           )}

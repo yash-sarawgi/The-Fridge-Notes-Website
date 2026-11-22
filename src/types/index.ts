@@ -62,6 +62,7 @@ export interface FridgeSettings {
   butterNoteText: string;
   moodNoteText: string;
   defaultAudioEnabled: boolean;
+  notesScale?: number;
   introNotePos?: { x: number; y: number; scale?: number; rotation?: number };
   butterNotePos?: { x: number; y: number; scale?: number; rotation?: number };
   moodNotePos?: { x: number; y: number; scale?: number; rotation?: number };
