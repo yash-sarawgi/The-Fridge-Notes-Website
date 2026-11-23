@@ -173,16 +173,16 @@ export const Refrigerator: React.FC = () => {
 
       {/* ============================================================== */}
       {/* 1:1 RETRO FRIDGE SCENE CONTAINER                               */}
-      {/* Zoomed in significantly (175vw) so the fridge fills ~90% of    */}
-      {/* the screen, and shifted up (marginTop -15vw) to eliminate      */}
-      {/* the top blank wall space completely.                           */}
+      {/* Elegantly framed to natural 1:1 kitchen proportions so the     */}
+      {/* entire fridge, whiteboard, and sticky notes are visible.       */}
       {/* ============================================================== */}
       <div
         className="relative flex-shrink-0"
         style={{
-          width: "clamp(1200px, 175vw, 2400px)",
-          height: "clamp(1200px, 175vw, 2400px)",
-          marginTop: "clamp(-260px, -15vw, -140px)",
+          width: "min(100vw, 1150px)",
+          height: "min(100vw, 1150px)",
+          aspectRatio: "1 / 1",
+          marginTop: "clamp(-45px, -3.5vw, -15px)",
         }}
       >
         {/* Real Kitchen Background Photo */}
@@ -191,7 +191,6 @@ export const Refrigerator: React.FC = () => {
           src="/images/smeg-fridge-bg.jpg"
           alt="Retro blue fridge in warm orange kitchen"
           className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
-          style={{ maxWidth: "none" }}
           draggable={false}
         />
 
@@ -224,14 +223,14 @@ export const Refrigerator: React.FC = () => {
           </button>
         </div>
 
-        {/* 2. Kitchen Whiteboard (MOUNTED ON FREEZER DOOR per user request) */}
+        {/* 2. Kitchen Whiteboard (MOUNTED ON FREEZER DOOR) */}
         <div
           className="absolute z-30"
           style={{
             left: "51.05%",
             top: "22.8%",
             transform: "translateX(-50%)",
-            width: "clamp(280px, 29%, 560px)",
+            width: "clamp(260px, 29%, 340px)",
           }}
         >
           <KitchenWhiteboard
@@ -312,9 +311,9 @@ export const Refrigerator: React.FC = () => {
           className="absolute z-20"
           style={{
             left: "51.05%",
-            top: "49.5%",
+            top: "50.2%",
             transform: "translateX(-50%)",
-            width: "clamp(320px, 30.5%, 660px)",
+            width: "30.5%",
           }}
         >
           {/* VIEW 1: EXPANDED RECIPE SHEET */}
@@ -434,8 +433,8 @@ export const Refrigerator: React.FC = () => {
           className="absolute z-20 pointer-events-none"
           style={{
             left: "60%",
-            top: "84.5%",
-            width: "clamp(65px, 6.5%, 95px)",
+            top: "82.5%",
+            width: "clamp(55px, 6.8%, 80px)",
             transform: "rotate(2deg)",
           }}
         >

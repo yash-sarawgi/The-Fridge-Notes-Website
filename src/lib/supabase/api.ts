@@ -132,7 +132,14 @@ function getLocalFridgeData(): {
       if (savedRecipes) recipes = JSON.parse(savedRecipes);
 
       const savedCategories = localStorage.getItem("fridge_notes_custom_categories");
-      if (savedCategories) categories = JSON.parse(savedCategories);
+      if (savedCategories) {
+        const parsed: Category[] = JSON.parse(savedCategories);
+        const naturalTilts = [-2.5, 1.8, -3.2, 2.2, -1.5, 2.8, -2.0, 1.6, -3.5];
+        categories = parsed.map((c, i) => ({
+          ...c,
+          rotation: (c.rotation !== undefined && c.rotation !== 0) ? c.rotation : naturalTilts[i % naturalTilts.length],
+        }));
+      }
 
       const savedSettings = localStorage.getItem("fridge_notes_settings");
       if (savedSettings) settings = { ...defaultFridgeSettings, ...JSON.parse(savedSettings) };
