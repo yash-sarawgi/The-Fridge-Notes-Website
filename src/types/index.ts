@@ -54,6 +54,18 @@ export interface Category {
   displayOrder?: number;
 }
 
+export interface FridgeTag {
+  id: string;
+  text: string;
+  subText?: string;
+  color?: string;
+  magnetColor?: string;
+  xPos: number;
+  yPos: number;
+  rotation?: number;
+  scale?: number;
+}
+
 export interface FridgeSettings {
   id: string;
   badgeText: string;
@@ -63,9 +75,11 @@ export interface FridgeSettings {
   moodNoteText: string;
   defaultAudioEnabled: boolean;
   notesScale?: number;
+  whiteboardPos?: { x: number; y: number; width?: number };
   introNotePos?: { x: number; y: number; scale?: number; rotation?: number };
   butterNotePos?: { x: number; y: number; scale?: number; rotation?: number };
   moodNotePos?: { x: number; y: number; scale?: number; rotation?: number };
+  customTags?: FridgeTag[];
 }
 
 export interface SiteConfig {

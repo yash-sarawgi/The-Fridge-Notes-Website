@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Category, FridgeSettings } from "@/types";
+import { Category, FridgeSettings, FridgeTag } from "@/types";
 import { Magnet } from "../Magnet";
+import { defaultFridgeTags } from "@/lib/supabase/api";
 import {
   Move,
   ZoomIn,
@@ -27,6 +28,10 @@ import {
   Salad,
   Flame,
   Wand2,
+  Plus,
+  Trash2,
+  Tag,
+  ClipboardList,
   type LucideIcon,
 } from "lucide-react";
 
@@ -59,9 +64,19 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
 }) => {
   const [categories, setCategories] = useState<Category[]>(initialCategoriesProp);
   const [settings, setSettings] = useState<FridgeSettings>(initialSettingsProp);
-  const [selectedId, setSelectedId] = useState<string>(categories[0]?.id || "sandwiches");
+  const [activeTab, setActiveTab] = useState<"categories" | "whiteboard" | "tags">("categories");
+
+  // Selected Category
+  const [selectedCatId, setSelectedCatId] = useState<string>(categories[0]?.id || "sandwiches");
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  // Selected Custom Tag
+  const tagsList = settings.customTags && settings.customTags.length > 0
+    ? settings.customTags
+    : defaultFridgeTags;
+  const [selectedTagId, setSelectedTagId] = useState<string>(tagsList[0]?.id || "tag-butter");
+
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   useEffect(() => {
@@ -69,74 +84,58 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
   }, [initialCategoriesProp]);
 
   useEffect(() => {
-    setSettings(initialSettingsProp);
+    setSettings((prev) => ({
+      ...initialSettingsProp,
+      customTags:
+        initialSettingsProp.customTags && initialSettingsProp.customTags.length > 0
+          ? initialSettingsProp.customTags
+          : prev.customTags || defaultFridgeTags,
+      whiteboardPos: initialSettingsProp.whiteboardPos || { x: 51.05, y: 22.8, width: 29 },
+    }));
   }, [initialSettingsProp]);
 
-  const selectedIndex = categories.findIndex((c) => c.id === selectedId);
-  const selectedCategory = categories[selectedIndex] || categories[0];
+  // Selected Category
+  const selectedCatIndex = categories.findIndex((c) => c.id === selectedCatId);
+  const selectedCategory = categories[selectedCatIndex] || categories[0];
 
-  // Helper to update selected category attributes
-  const updateSelected = (updates: Partial<Category>) => {
+  const updateSelectedCategory = (updates: Partial<Category>) => {
     if (!selectedCategory) return;
     setCategories((prev) =>
       prev.map((c) => (c.id === selectedCategory.id ? { ...c, ...updates } : c))
     );
   };
 
-  // Reordering helpers (Move slot in 3x3 grid)
+  // Category Reordering
   const swapCategories = (indexA: number, indexB: number) => {
-    if (indexA < 0 || indexA >= categories.length || indexB < 0 || indexB >= categories.length) {
-      return;
-    }
+    if (indexA < 0 || indexA >= categories.length || indexB < 0 || indexB >= categories.length) return;
     const copy = [...categories];
     const temp = copy[indexA];
     copy[indexA] = copy[indexB];
     copy[indexB] = temp;
-    // Update displayOrder
     copy.forEach((c, idx) => {
       c.displayOrder = idx;
     });
     setCategories(copy);
   };
 
-  const handleMove = (direction: "up" | "down" | "left" | "right") => {
-    if (selectedIndex === -1) return;
-    const col = selectedIndex % 3;
-    const row = Math.floor(selectedIndex / 3);
+  const handleMoveCategory = (direction: "up" | "down" | "left" | "right") => {
+    if (selectedCatIndex === -1) return;
+    const col = selectedCatIndex % 3;
+    const row = Math.floor(selectedCatIndex / 3);
 
-    let targetIndex = selectedIndex;
-    if (direction === "left" && col > 0) targetIndex = selectedIndex - 1;
-    if (direction === "right" && col < 2) targetIndex = selectedIndex + 1;
-    if (direction === "up" && row > 0) targetIndex = selectedIndex - 3;
+    let targetIndex = selectedCatIndex;
+    if (direction === "left" && col > 0) targetIndex = selectedCatIndex - 1;
+    if (direction === "right" && col < 2) targetIndex = selectedCatIndex + 1;
+    if (direction === "up" && row > 0) targetIndex = selectedCatIndex - 3;
     if (direction === "down" && row < Math.floor((categories.length - 1) / 3)) {
-      targetIndex = selectedIndex + 3;
+      targetIndex = selectedCatIndex + 3;
     }
 
-    if (targetIndex !== selectedIndex && targetIndex < categories.length) {
-      swapCategories(selectedIndex, targetIndex);
+    if (targetIndex !== selectedCatIndex && targetIndex < categories.length) {
+      swapCategories(selectedCatIndex, targetIndex);
     }
   };
 
-  // Drag and Drop reordering on the fridge door
-  const handleDragStart = (idx: number) => {
-    setDraggedIndex(idx);
-    setSelectedId(categories[idx].id);
-  };
-
-  const handleDragOver = (e: React.DragEvent, idx: number) => {
-    e.preventDefault();
-    setDragOverIndex(idx);
-  };
-
-  const handleDrop = (idx: number) => {
-    if (draggedIndex !== null && draggedIndex !== idx) {
-      swapCategories(draggedIndex, idx);
-    }
-    setDraggedIndex(null);
-    setDragOverIndex(null);
-  };
-
-  // Randomize natural tilts
   const handleRandomizeTilts = () => {
     const tilts = [-3, 2, -2, 3, -1.5, 2.5, -2.5, 1.5, -3.5];
     setCategories((prev) =>
@@ -147,14 +146,61 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
     );
   };
 
-  // Straighten all notes
-  const handleStraightenAll = () => {
-    setCategories((prev) =>
-      prev.map((c) => ({
-        ...c,
-        rotation: 0,
-      }))
+  // Kitchen Board Position Updates
+  const currentWhiteboardPos = {
+    x: settings.whiteboardPos?.x ?? 51.05,
+    y: settings.whiteboardPos?.y ?? 22.8,
+    width: settings.whiteboardPos?.width ?? 29,
+  };
+  const updateWhiteboardPos = (updates: Partial<{ x: number; y: number; width: number }>) => {
+    setSettings((prev) => ({
+      ...prev,
+      whiteboardPos: {
+        x: updates.x ?? prev.whiteboardPos?.x ?? 51.05,
+        y: updates.y ?? prev.whiteboardPos?.y ?? 22.8,
+        width: updates.width ?? prev.whiteboardPos?.width ?? 29,
+      },
+    }));
+  };
+
+  // Custom Tags Management
+  const currentTags = settings.customTags && settings.customTags.length > 0
+    ? settings.customTags
+    : defaultFridgeTags;
+  const selectedTag = currentTags.find((t) => t.id === selectedTagId) || currentTags[0];
+
+  const updateSelectedTag = (updates: Partial<FridgeTag>) => {
+    if (!selectedTag) return;
+    const updated = currentTags.map((t) =>
+      t.id === selectedTag.id ? { ...t, ...updates } : t
     );
+    setSettings((prev) => ({ ...prev, customTags: updated }));
+  };
+
+  const handleAddTag = () => {
+    const newId = `tag-${Date.now()}`;
+    const newTag: FridgeTag = {
+      id: newId,
+      text: "New Reminder 📌",
+      color: "#fef08a",
+      magnetColor: "#ef4444",
+      xPos: 60.0,
+      yPos: 50.0,
+      rotation: (Math.random() * 6 - 3),
+      scale: 1,
+    };
+    const updated = [...currentTags, newTag];
+    setSettings((prev) => ({ ...prev, customTags: updated }));
+    setSelectedTagId(newId);
+    setActiveTab("tags");
+  };
+
+  const handleDeleteTag = (id: string) => {
+    const filtered = currentTags.filter((t) => t.id !== id);
+    setSettings((prev) => ({ ...prev, customTags: filtered }));
+    if (selectedTagId === id && filtered.length > 0) {
+      setSelectedTagId(filtered[0].id);
+    }
   };
 
   // Save layout
@@ -206,7 +252,7 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
             Visual Fridge Notes Arranger
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Click any sticky note to customize it, drag & drop to swap door positions, or adjust size & tilt.
+            Customize category sticky notes, Kitchen Board position, and add/remove custom fridge text tags.
           </p>
         </div>
         <div className="flex items-center gap-2.5">
@@ -248,10 +294,10 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
           <div className="w-full flex items-center justify-between text-xs text-slate-400 mb-2.5 px-1">
             <span className="flex items-center gap-1.5 font-medium text-slate-300">
               <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-              Live Fridge Preview (1:1 with Public Website)
+              Interactive Fridge Canvas
             </span>
             <span className="text-[11px] text-slate-500 font-mono">
-              Drag notes to swap positions
+              Click elements to select and edit
             </span>
           </div>
 
@@ -269,7 +315,7 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
               className="absolute z-20 pointer-events-none"
               style={{
                 left: "51.05%",
-                top: "17.5%",
+                top: "17.2%",
                 transform: "translateX(-50%)",
               }}
             >
@@ -278,19 +324,27 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
               </div>
             </div>
 
-            {/* Kitchen Whiteboard on Freezer Door */}
+            {/* Kitchen Whiteboard on Freezer Door (Interactive) */}
             <div
-              className="absolute z-20 pointer-events-none"
+              onClick={() => setActiveTab("whiteboard")}
+              className={`absolute z-20 cursor-pointer transition-all ${
+                activeTab === "whiteboard"
+                  ? "ring-2 ring-sky-400 ring-offset-1 ring-offset-slate-900 shadow-xl"
+                  : "hover:scale-[1.01]"
+              }`}
               style={{
-                left: "51.05%",
-                top: "23%",
+                left: `${currentWhiteboardPos.x}%`,
+                top: `${currentWhiteboardPos.y}%`,
                 transform: "translateX(-50%)",
-                width: "29%",
+                width: `${currentWhiteboardPos.width}%`,
               }}
             >
               <div className="bg-white/95 rounded border border-slate-300 p-1.5 shadow-sm text-center">
-                <span className="text-[10px] font-bold text-slate-700 font-sans">
+                <span className="text-[10px] font-bold text-slate-800 font-sans">
                   📋 Kitchen Board
+                </span>
+                <span className="block text-[8px] text-slate-500 font-mono">
+                  (Click to adjust placement)
                 </span>
               </div>
             </div>
@@ -300,7 +354,7 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
               className="absolute z-20 pointer-events-none"
               style={{
                 left: "48%",
-                top: "35.2%",
+                top: "35.8%",
                 transform: "translateX(-50%) rotate(-1deg)",
                 width: "19%",
               }}
@@ -312,15 +366,50 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
               </div>
             </div>
 
-            {/* ============================================================== */}
-            {/* LOWER FRIDGE DOOR NOTES ZONE: 100% CONFINED INSIDE BLUE DOOR */}
-            {/* Exact dimensions: left 51.05%, top 49.5%, width 30.5%           */}
-            {/* ============================================================== */}
+            {/* Dynamic Custom Fridge Sticky Tags */}
+            {currentTags.map((tag) => {
+              const isSelectedTag = activeTab === "tags" && selectedTag?.id === tag.id;
+              return (
+                <div
+                  key={tag.id}
+                  onClick={() => {
+                    setSelectedTagId(tag.id);
+                    setActiveTab("tags");
+                  }}
+                  className={`absolute z-25 cursor-pointer transition-transform ${
+                    isSelectedTag ? "ring-2 ring-sky-400 shadow-lg scale-110" : "hover:scale-105"
+                  }`}
+                  style={{
+                    left: `${tag.xPos}%`,
+                    top: `${tag.yPos}%`,
+                    transform: `translate(-50%, -50%) rotate(${tag.rotation ?? 0}deg) scale(${tag.scale ?? 1})`,
+                  }}
+                >
+                  <div
+                    className="relative rounded-xs shadow-sm border text-center whitespace-nowrap p-1 px-1.5"
+                    style={{
+                      backgroundColor: tag.color || "#fef9c3",
+                      borderColor: "rgba(0,0,0,0.15)",
+                      color: "#2a1508",
+                      fontSize: "8.5px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    <div className="absolute -top-1.5 left-1/2 -translate-x-1/2">
+                      <Magnet color={tag.magnetColor || "#ef4444"} size="sm" shape="round" />
+                    </div>
+                    <span>{tag.text}</span>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* LOWER FRIDGE DOOR NOTES ZONE */}
             <div
               className="absolute z-30 transition-all"
               style={{
                 left: "51.05%",
-                top: "49.5%",
+                top: "50.0%",
                 transform: `translateX(-50%) scale(${settings.notesScale || 1})`,
                 transformOrigin: "top center",
                 width: "30.5%",
@@ -333,10 +422,10 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
                 </span>
               </div>
 
-              {/* 3x3 Door Grid - Exactly matches frontend */}
+              {/* 3x3 Door Grid */}
               <div className="grid grid-cols-3 gap-1 sm:gap-1.5 justify-items-center">
                 {categories.map((cat, idx) => {
-                  const isSelected = cat.id === selectedCategory?.id;
+                  const isSelected = activeTab === "categories" && cat.id === selectedCategory?.id;
                   const isDragTarget = dragOverIndex === idx;
                   const IconComp = iconMap[cat.iconName] || Flame;
                   const scale = cat.scale ?? 1;
@@ -346,10 +435,26 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
                     <div
                       key={cat.id}
                       draggable
-                      onDragStart={() => handleDragStart(idx)}
-                      onDragOver={(e) => handleDragOver(e, idx)}
-                      onDrop={() => handleDrop(idx)}
-                      onClick={() => setSelectedId(cat.id)}
+                      onDragStart={() => {
+                        setDraggedIndex(idx);
+                        setSelectedCatId(cat.id);
+                        setActiveTab("categories");
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setDragOverIndex(idx);
+                      }}
+                      onDrop={() => {
+                        if (draggedIndex !== null && draggedIndex !== idx) {
+                          swapCategories(draggedIndex, idx);
+                        }
+                        setDraggedIndex(null);
+                        setDragOverIndex(null);
+                      }}
+                      onClick={() => {
+                        setSelectedCatId(cat.id);
+                        setActiveTab("categories");
+                      }}
                       style={{
                         backgroundColor: cat.color || "#fef08a",
                         transform: `rotate(${rotation}deg) scale(${scale})`,
@@ -391,301 +496,477 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
                 })}
               </div>
             </div>
-
-            {/* Mood Note on bottom right of fridge door */}
-            <div
-              className="absolute z-20 pointer-events-none"
-              style={{
-                left: "60%",
-                top: "84.5%",
-                width: "6.5%",
-                transform: "rotate(2deg)",
-              }}
-            >
-              <div className="px-1 py-0.5 bg-rose-100 text-rose-950 text-[7px] font-bold rounded shadow-xs border border-rose-200 truncate text-center">
-                🍓 Mood
-              </div>
-            </div>
           </div>
         </div>
 
-        {/* Right: Selected Sticky Note Customizer */}
+        {/* Right: Inspector & Controls Panel */}
         <div className="lg:col-span-5 bg-slate-900/95 p-5 rounded-2xl border border-slate-800 shadow-xl space-y-5">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div>
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-sky-400" />
-                Note Customizer
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Customize size, position slot, rotation and color.
-              </p>
-            </div>
-            {selectedCategory && (
-              <span className="text-xs font-mono font-bold px-2 py-0.5 bg-sky-950 text-sky-400 border border-sky-800 rounded-full">
-                Slot #{selectedIndex + 1} of 9
-              </span>
-            )}
+          {/* Section Switcher Tabs */}
+          <div className="flex items-center gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800 text-xs">
+            <button
+              onClick={() => setActiveTab("categories")}
+              className={`flex-1 py-1.5 px-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+                activeTab === "categories"
+                  ? "bg-sky-500 text-slate-950 shadow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              Category Notes
+            </button>
+            <button
+              onClick={() => setActiveTab("whiteboard")}
+              className={`flex-1 py-1.5 px-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+                activeTab === "whiteboard"
+                  ? "bg-sky-500 text-slate-950 shadow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <ClipboardList className="w-3.5 h-3.5" />
+              Kitchen Board
+            </button>
+            <button
+              onClick={() => setActiveTab("tags")}
+              className={`flex-1 py-1.5 px-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+                activeTab === "tags"
+                  ? "bg-sky-500 text-slate-950 shadow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Tag className="w-3.5 h-3.5" />
+              Sticky Tags ({currentTags.length})
+            </button>
           </div>
 
-          {/* Quick Note Selector Grid (3x3 matching fridge) */}
-          <div>
-            <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5 block">
-              Door Slots (Click to Select Note)
-            </label>
-            <div className="grid grid-cols-3 gap-1.5 bg-slate-950 p-2 rounded-xl border border-slate-800">
-              {categories.map((c, idx) => (
-                <button
-                  key={c.id}
-                  onClick={() => setSelectedId(c.id)}
-                  style={{
-                    backgroundColor: c.id === selectedCategory?.id ? c.color : "#1e293b",
-                    color: c.id === selectedCategory?.id ? "#0f172a" : "#cbd5e1",
-                    fontWeight: c.id === selectedCategory?.id ? "bold" : "normal",
-                  }}
-                  className={`p-2 rounded-lg text-xs truncate text-center border transition-all ${
-                    c.id === selectedCategory?.id
-                      ? "border-sky-400 shadow-md ring-1 ring-sky-400 scale-[1.02]"
-                      : "border-slate-800 hover:border-slate-700"
-                  }`}
-                >
-                  <span className="block text-[9px] font-mono text-slate-500 mb-0.5">
-                    Slot #{idx + 1}
-                  </span>
-                  <span className="truncate block font-semibold">{c.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {selectedCategory && (
-            <div className="space-y-4 pt-1 text-xs">
-              {/* Slot Reorder Buttons */}
-              <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
-                <label className="font-semibold text-slate-300 block">
-                  Move Note on Fridge Door
-                </label>
-                <div className="grid grid-cols-4 gap-1.5">
-                  <button
-                    onClick={() => handleMove("up")}
-                    className="p-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-md flex items-center justify-center gap-1 transition-colors"
-                  >
-                    <ArrowUp className="w-3 h-3 text-sky-400" /> Up
-                  </button>
-                  <button
-                    onClick={() => handleMove("down")}
-                    className="p-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-md flex items-center justify-center gap-1 transition-colors"
-                  >
-                    <ArrowDown className="w-3 h-3 text-sky-400" /> Down
-                  </button>
-                  <button
-                    onClick={() => handleMove("left")}
-                    className="p-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-md flex items-center justify-center gap-1 transition-colors"
-                  >
-                    <ArrowLeft className="w-3 h-3 text-sky-400" /> Left
-                  </button>
-                  <button
-                    onClick={() => handleMove("right")}
-                    className="p-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-md flex items-center justify-center gap-1 transition-colors"
-                  >
-                    <ArrowRight className="w-3 h-3 text-sky-400" /> Right
-                  </button>
-                </div>
-              </div>
-
-              {/* Note Content Edit */}
-              <div className="space-y-2">
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1">
-                    Note Title
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedCategory.name}
-                    onChange={(e) => updateSelected({ name: e.target.value })}
-                    className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1">
-                    Short Description
-                  </label>
-                  <input
-                    type="text"
-                    value={selectedCategory.description}
-                    onChange={(e) => updateSelected({ description: e.target.value })}
-                    className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Sliders: Size and Rotation */}
-              <div className="space-y-3 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-                {/* Individual Note Size */}
-                <div>
-                  <div className="flex justify-between text-xs text-slate-300 mb-1">
-                    <span className="flex items-center gap-1 font-medium">
-                      <ZoomIn className="w-3.5 h-3.5 text-sky-400" />
-                      This Note Size / Scale
-                    </span>
-                    <span className="font-mono text-sky-400 font-bold">
-                      {Math.round((selectedCategory.scale || 1) * 100)}%
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0.75"
-                    max="1.25"
-                    step="0.05"
-                    value={selectedCategory.scale || 1}
-                    onChange={(e) => updateSelected({ scale: parseFloat(e.target.value) })}
-                    className="w-full accent-sky-400 cursor-pointer"
-                  />
-                </div>
-
-                {/* Tilt / Rotation */}
-                <div>
-                  <div className="flex justify-between text-xs text-slate-300 mb-1">
-                    <span className="flex items-center gap-1 font-medium">
-                      <RotateCw className="w-3.5 h-3.5 text-sky-400" />
-                      Tilt / Rotation
-                    </span>
-                    <span className="font-mono text-sky-400 font-bold">
-                      {selectedCategory.rotation > 0
-                        ? `+${selectedCategory.rotation}°`
-                        : `${selectedCategory.rotation || 0}°`}
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="-12"
-                    max="12"
-                    step="0.5"
-                    value={selectedCategory.rotation || 0}
-                    onChange={(e) => updateSelected({ rotation: parseFloat(e.target.value) })}
-                    className="w-full accent-sky-400 cursor-pointer"
-                  />
-                  <div className="flex gap-2 mt-1.5">
-                    <button
-                      onClick={() => updateSelected({ rotation: -2.5 })}
-                      className="px-2 py-0.5 bg-slate-900 border border-slate-800 text-[10px] rounded text-slate-300 hover:text-white"
-                    >
-                      Tilt Left (-2.5°)
-                    </button>
-                    <button
-                      onClick={() => updateSelected({ rotation: 0 })}
-                      className="px-2 py-0.5 bg-slate-900 border border-slate-800 text-[10px] rounded text-slate-300 hover:text-white"
-                    >
-                      Straight (0°)
-                    </button>
-                    <button
-                      onClick={() => updateSelected({ rotation: 2.5 })}
-                      className="px-2 py-0.5 bg-slate-900 border border-slate-800 text-[10px] rounded text-slate-300 hover:text-white"
-                    >
-                      Tilt Right (+2.5°)
-                    </button>
-                  </div>
-                </div>
-
-                {/* Master All-Notes Scale */}
-                <div className="pt-2 border-t border-slate-800/80">
-                  <div className="flex justify-between text-xs text-slate-300 mb-1">
-                    <span className="font-medium text-amber-300">
-                      Master Size (All 9 Notes on Fridge)
-                    </span>
-                    <span className="font-mono text-amber-400 font-bold">
-                      {Math.round((settings.notesScale || 1) * 100)}%
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0.80"
-                    max="1.20"
-                    step="0.05"
-                    value={settings.notesScale || 1}
-                    onChange={(e) =>
-                      setSettings({ ...settings, notesScale: parseFloat(e.target.value) })
-                    }
-                    className="w-full accent-amber-400 cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              {/* Colors */}
-              <div className="grid grid-cols-2 gap-3">
-                {/* Paper Color */}
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1.5 flex items-center gap-1">
-                    <Palette className="w-3.5 h-3.5 text-amber-400" />
-                    Sticky Paper Color
-                  </label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {paperColors.map((color) => (
-                      <button
-                        key={color.value}
-                        title={color.name}
-                        onClick={() => updateSelected({ color: color.value })}
-                        style={{ backgroundColor: color.value }}
-                        className={`w-6 h-6 rounded-md border transition-transform ${
-                          selectedCategory.color === color.value
-                            ? "ring-2 ring-sky-400 scale-110 border-white"
-                            : "border-slate-700 hover:scale-105"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Magnet Pin Color */}
-                <div>
-                  <label className="font-semibold text-slate-300 block mb-1.5">
-                    Magnet Pin Color
-                  </label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {magnetColors.map((color) => (
-                      <button
-                        key={color.value}
-                        title={color.name}
-                        onClick={() => updateSelected({ magnetColor: color.value })}
-                        style={{ backgroundColor: color.value }}
-                        className={`w-6 h-6 rounded-full border transition-transform shadow ${
-                          selectedCategory.magnetColor === color.value
-                            ? "ring-2 ring-sky-400 scale-110 border-white"
-                            : "border-slate-700 hover:scale-105"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Icon Picker */}
+          {/* TAB 1: CATEGORY NOTES */}
+          {activeTab === "categories" && (
+            <div className="space-y-4">
               <div>
-                <label className="font-semibold text-slate-300 block mb-1.5">
-                  Category Note Icon
+                <label className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5 block">
+                  Select Door Slot ({selectedCatIndex + 1} of 9)
                 </label>
-                <div className="flex flex-wrap gap-1.5">
-                  {availableIcons.map((ic) => {
-                    const IcComponent = iconMap[ic.name] || Flame;
-                    const isSelectedIcon = selectedCategory.iconName === ic.name;
-                    return (
-                      <button
-                        key={ic.name}
-                        onClick={() => updateSelected({ iconName: ic.name })}
-                        className={`px-2 py-1 rounded-md text-[10px] flex items-center gap-1 border transition-all ${
-                          isSelectedIcon
-                            ? "bg-sky-500/20 border-sky-400 text-sky-300 font-bold"
-                            : "bg-slate-950 border-slate-800 text-slate-400 hover:text-white"
-                        }`}
-                      >
-                        <IcComponent className="w-3 h-3" />
-                        <span>{ic.label}</span>
-                      </button>
-                    );
-                  })}
+                <div className="grid grid-cols-3 gap-1.5 bg-slate-950 p-2 rounded-xl border border-slate-800">
+                  {categories.map((c, idx) => (
+                    <button
+                      key={c.id}
+                      onClick={() => setSelectedCatId(c.id)}
+                      style={{
+                        backgroundColor: c.id === selectedCategory?.id ? c.color : "#1e293b",
+                        color: c.id === selectedCategory?.id ? "#0f172a" : "#cbd5e1",
+                        fontWeight: c.id === selectedCategory?.id ? "bold" : "normal",
+                      }}
+                      className={`p-1.5 rounded-lg text-xs truncate text-center border transition-all ${
+                        c.id === selectedCategory?.id
+                          ? "border-sky-400 shadow ring-1 ring-sky-400 scale-[1.02]"
+                          : "border-slate-800 hover:border-slate-700"
+                      }`}
+                    >
+                      <span className="block text-[8.5px] font-mono text-slate-500">
+                        Slot #{idx + 1}
+                      </span>
+                      <span className="truncate block font-semibold text-[11px]">{c.name}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
+
+              {selectedCategory && (
+                <div className="space-y-4 pt-1 text-xs">
+                  {/* Slot Reorder Buttons */}
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
+                    <label className="font-semibold text-slate-300 block">
+                      Move Slot on Fridge Door
+                    </label>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      <button
+                        onClick={() => handleMoveCategory("up")}
+                        className="p-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-md flex items-center justify-center gap-1 transition-colors"
+                      >
+                        <ArrowUp className="w-3 h-3 text-sky-400" /> Up
+                      </button>
+                      <button
+                        onClick={() => handleMoveCategory("down")}
+                        className="p-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-md flex items-center justify-center gap-1 transition-colors"
+                      >
+                        <ArrowDown className="w-3 h-3 text-sky-400" /> Down
+                      </button>
+                      <button
+                        onClick={() => handleMoveCategory("left")}
+                        className="p-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-md flex items-center justify-center gap-1 transition-colors"
+                      >
+                        <ArrowLeft className="w-3 h-3 text-sky-400" /> Left
+                      </button>
+                      <button
+                        onClick={() => handleMoveCategory("right")}
+                        className="p-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 rounded-md flex items-center justify-center gap-1 transition-colors"
+                      >
+                        <ArrowRight className="w-3 h-3 text-sky-400" /> Right
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Note Content Edit */}
+                  <div className="space-y-2">
+                    <div>
+                      <label className="font-semibold text-slate-300 block mb-1">Note Title</label>
+                      <input
+                        type="text"
+                        value={selectedCategory.name}
+                        onChange={(e) => updateSelectedCategory({ name: e.target.value })}
+                        className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-semibold text-slate-300 block mb-1">Short Description</label>
+                      <input
+                        type="text"
+                        value={selectedCategory.description}
+                        onChange={(e) => updateSelectedCategory({ description: e.target.value })}
+                        className="w-full px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-white text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Sliders: Size and Rotation */}
+                  <div className="space-y-3 bg-slate-950 p-3 rounded-xl border border-slate-800">
+                    <div>
+                      <div className="flex justify-between text-xs text-slate-300 mb-1">
+                        <span className="flex items-center gap-1 font-medium">
+                          <ZoomIn className="w-3.5 h-3.5 text-sky-400" /> This Note Scale
+                        </span>
+                        <span className="font-mono text-sky-400 font-bold">
+                          {Math.round((selectedCategory.scale || 1) * 100)}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.75"
+                        max="1.25"
+                        step="0.05"
+                        value={selectedCategory.scale || 1}
+                        onChange={(e) => updateSelectedCategory({ scale: parseFloat(e.target.value) })}
+                        className="w-full accent-sky-400 cursor-pointer"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-xs text-slate-300 mb-1">
+                        <span className="flex items-center gap-1 font-medium">
+                          <RotateCw className="w-3.5 h-3.5 text-sky-400" /> Tilt / Rotation
+                        </span>
+                        <span className="font-mono text-sky-400 font-bold">
+                          {selectedCategory.rotation > 0
+                            ? `+${selectedCategory.rotation}°`
+                            : `${selectedCategory.rotation || 0}°`}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="-12"
+                        max="12"
+                        step="0.5"
+                        value={selectedCategory.rotation || 0}
+                        onChange={(e) => updateSelectedCategory({ rotation: parseFloat(e.target.value) })}
+                        className="w-full accent-sky-400 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Paper & Magnet Colors */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="font-semibold text-slate-300 block mb-1 flex items-center gap-1">
+                        <Palette className="w-3.5 h-3.5 text-amber-400" /> Sticky Color
+                      </label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {paperColors.map((color) => (
+                          <button
+                            key={color.value}
+                            title={color.name}
+                            onClick={() => updateSelectedCategory({ color: color.value })}
+                            style={{ backgroundColor: color.value }}
+                            className={`w-5 h-5 rounded border ${
+                              selectedCategory.color === color.value
+                                ? "ring-2 ring-sky-400 scale-110 border-white"
+                                : "border-slate-700"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="font-semibold text-slate-300 block mb-1">Pin Magnet</label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {magnetColors.map((color) => (
+                          <button
+                            key={color.value}
+                            title={color.name}
+                            onClick={() => updateSelectedCategory({ magnetColor: color.value })}
+                            style={{ backgroundColor: color.value }}
+                            className={`w-5 h-5 rounded-full border shadow ${
+                              selectedCategory.magnetColor === color.value
+                                ? "ring-2 ring-sky-400 scale-110 border-white"
+                                : "border-slate-700"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: KITCHEN BOARD PLACEMENT */}
+          {activeTab === "whiteboard" && (
+            <div className="space-y-4 text-xs">
+              <div>
+                <h4 className="font-bold text-white text-sm flex items-center gap-1.5">
+                  <ClipboardList className="w-4 h-4 text-sky-400" />
+                  Kitchen Board Box Placement
+                </h4>
+                <p className="text-slate-400 text-xs mt-0.5">
+                  Adjust where the magnetic Kitchen Whiteboard sits on the freezer door.
+                </p>
+              </div>
+
+              <div className="space-y-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                {/* Y Position */}
+                <div>
+                  <div className="flex justify-between text-slate-300 mb-1 font-medium">
+                    <span>Vertical Position (Y % on Freezer Door)</span>
+                    <span className="font-mono text-sky-400 font-bold">
+                      {currentWhiteboardPos.y.toFixed(1)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="18.0"
+                    max="32.0"
+                    step="0.2"
+                    value={currentWhiteboardPos.y}
+                    onChange={(e) => updateWhiteboardPos({ y: parseFloat(e.target.value) })}
+                    className="w-full accent-sky-400 cursor-pointer"
+                  />
+                  <span className="text-[10px] text-slate-500">
+                    Recommended: 21% to 24% (default: 22.8%)
+                  </span>
+                </div>
+
+                {/* X Position */}
+                <div>
+                  <div className="flex justify-between text-slate-300 mb-1 font-medium">
+                    <span>Horizontal Center (X %)</span>
+                    <span className="font-mono text-sky-400 font-bold">
+                      {currentWhiteboardPos.x.toFixed(1)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="46.0"
+                    max="56.0"
+                    step="0.2"
+                    value={currentWhiteboardPos.x}
+                    onChange={(e) => updateWhiteboardPos({ x: parseFloat(e.target.value) })}
+                    className="w-full accent-sky-400 cursor-pointer"
+                  />
+                  <span className="text-[10px] text-slate-500">
+                    Centered on fridge door: 51.05%
+                  </span>
+                </div>
+
+                {/* Width */}
+                <div>
+                  <div className="flex justify-between text-slate-300 mb-1 font-medium">
+                    <span>Board Width (%)</span>
+                    <span className="font-mono text-sky-400 font-bold">
+                      {currentWhiteboardPos.width.toFixed(1)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="24.0"
+                    max="33.0"
+                    step="0.5"
+                    value={currentWhiteboardPos.width}
+                    onChange={(e) => updateWhiteboardPos({ width: parseFloat(e.target.value) })}
+                    className="w-full accent-sky-400 cursor-pointer"
+                  />
+                </div>
+
+                {/* Reset button */}
+                <div className="pt-2 border-t border-slate-800 flex justify-end">
+                  <button
+                    onClick={() => updateWhiteboardPos({ x: 51.05, y: 22.8, width: 29 })}
+                    className="px-2.5 py-1 text-[11px] text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-md"
+                  >
+                    Reset Board to Center
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: FRIDGE STICKY TAGS (ADD / REMOVE / EDIT) */}
+          {activeTab === "tags" && (
+            <div className="space-y-4 text-xs">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-white text-sm flex items-center gap-1.5">
+                    <Tag className="w-4 h-4 text-amber-400" />
+                    Custom Fridge Sticky Tags
+                  </h4>
+                  <p className="text-slate-400 text-xs mt-0.5">
+                    Add, edit, move, or remove custom sticky reminder tags on the fridge.
+                  </p>
+                </div>
+                <button
+                  onClick={handleAddTag}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold rounded-lg transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Add Tag
+                </button>
+              </div>
+
+              {/* Tag selector chips */}
+              <div className="flex flex-wrap gap-1.5 bg-slate-950 p-2 rounded-xl border border-slate-800 max-h-32 overflow-y-auto">
+                {currentTags.map((t) => {
+                  const isSel = selectedTag?.id === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setSelectedTagId(t.id)}
+                      style={{
+                        backgroundColor: isSel ? t.color || "#fef08a" : "#1e293b",
+                        color: isSel ? "#0f172a" : "#cbd5e1",
+                      }}
+                      className={`px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 border transition-all ${
+                        isSel ? "border-amber-400 shadow ring-1 ring-amber-400" : "border-slate-800"
+                      }`}
+                    >
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: t.magnetColor || "#ef4444" }}
+                      />
+                      <span className="truncate max-w-[120px]">{t.text}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {selectedTag && (
+                <div className="space-y-3 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <span className="font-semibold text-slate-300">Edit Selected Tag</span>
+                    <button
+                      onClick={() => handleDeleteTag(selectedTag.id)}
+                      className="flex items-center gap-1 text-[11px] text-red-400 hover:text-red-300 transition-colors"
+                      title="Remove this tag"
+                    >
+                      <Trash2 className="w-3 h-3" /> Delete Tag
+                    </button>
+                  </div>
+
+                  {/* Text Input */}
+                  <div>
+                    <label className="font-semibold text-slate-300 block mb-1">Tag Message *</label>
+                    <input
+                      type="text"
+                      value={selectedTag.text}
+                      onChange={(e) => updateSelectedTag({ text: e.target.value })}
+                      placeholder="e.g. Milk expired on Tuesday! 🥛"
+                      className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Position Sliders */}
+                  <div className="grid grid-cols-2 gap-2.5 pt-1">
+                    <div>
+                      <div className="flex justify-between text-slate-400 mb-0.5">
+                        <span>Horizontal (X %)</span>
+                        <span className="font-mono text-amber-400">{selectedTag.xPos.toFixed(1)}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="35.0"
+                        max="66.0"
+                        step="0.5"
+                        value={selectedTag.xPos}
+                        onChange={(e) => updateSelectedTag({ xPos: parseFloat(e.target.value) })}
+                        className="w-full accent-amber-400 cursor-pointer"
+                      />
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-slate-400 mb-0.5">
+                        <span>Vertical (Y %)</span>
+                        <span className="font-mono text-amber-400">{selectedTag.yPos.toFixed(1)}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="18.0"
+                        max="90.0"
+                        step="0.5"
+                        value={selectedTag.yPos}
+                        onChange={(e) => updateSelectedTag({ yPos: parseFloat(e.target.value) })}
+                        className="w-full accent-amber-400 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Rotation Slider */}
+                  <div>
+                    <div className="flex justify-between text-slate-400 mb-0.5">
+                      <span>Tilt Angle</span>
+                      <span className="font-mono text-amber-400">{selectedTag.rotation ?? 0}°</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="-12"
+                      max="12"
+                      step="0.5"
+                      value={selectedTag.rotation ?? 0}
+                      onChange={(e) => updateSelectedTag({ rotation: parseFloat(e.target.value) })}
+                      className="w-full accent-amber-400 cursor-pointer"
+                    />
+                  </div>
+
+                  {/* Colors */}
+                  <div className="grid grid-cols-2 gap-2.5 pt-1">
+                    <div>
+                      <label className="text-slate-400 block mb-1">Paper Color</label>
+                      <div className="flex flex-wrap gap-1">
+                        {paperColors.map((c) => (
+                          <button
+                            key={c.value}
+                            onClick={() => updateSelectedTag({ color: c.value })}
+                            style={{ backgroundColor: c.value }}
+                            className={`w-5 h-5 rounded border ${
+                              selectedTag.color === c.value ? "ring-2 ring-amber-400 border-white" : "border-slate-700"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-slate-400 block mb-1">Magnet Pin</label>
+                      <div className="flex flex-wrap gap-1">
+                        {magnetColors.map((c) => (
+                          <button
+                            key={c.value}
+                            onClick={() => updateSelectedTag({ magnetColor: c.value })}
+                            style={{ backgroundColor: c.value }}
+                            className={`w-5 h-5 rounded-full border ${
+                              selectedTag.magnetColor === c.value ? "ring-2 ring-amber-400 border-white" : "border-slate-700"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -1,8 +1,33 @@
-import { Recipe, Category, FridgeSettings } from "@/types";
+import { Recipe, Category, FridgeSettings, FridgeTag } from "@/types";
 import { initialCategories } from "@/data/categories";
 import { initialRecipes } from "@/data/recipes";
 import { siteConfig } from "@/config/siteConfig";
 import { getSupabaseBrowserClient } from "./client";
+
+export const defaultFridgeTags: FridgeTag[] = [
+  {
+    id: "tag-butter",
+    text: "Butter! 🧈",
+    subText: "",
+    color: "#fef9c3",
+    magnetColor: "#ef4444",
+    xPos: 60.5,
+    yPos: 36.0,
+    rotation: 3,
+    scale: 1,
+  },
+  {
+    id: "tag-mood",
+    text: "Good food = Good mood 🍓",
+    subText: "",
+    color: "#ffe4e6",
+    magnetColor: "#ec4899",
+    xPos: 60.0,
+    yPos: 83.5,
+    rotation: 2,
+    scale: 1,
+  },
+];
 
 export const defaultFridgeSettings: FridgeSettings = {
   id: "default",
@@ -13,9 +38,11 @@ export const defaultFridgeSettings: FridgeSettings = {
   moodNoteText: "Good food = Good mood 🍓",
   defaultAudioEnabled: siteConfig.defaultAudioEnabled,
   notesScale: 1,
-  introNotePos: { x: 48, y: 35.2, scale: 1, rotation: -1 },
-  butterNotePos: { x: 60.5, y: 35.5, scale: 1, rotation: 3 },
-  moodNotePos: { x: 60, y: 84.5, scale: 1, rotation: 2 },
+  whiteboardPos: { x: 51.05, y: 22.8, width: 29 },
+  introNotePos: { x: 48, y: 35.8, scale: 1, rotation: -1 },
+  butterNotePos: { x: 60.5, y: 36.0, scale: 1, rotation: 3 },
+  moodNotePos: { x: 60, y: 83.5, scale: 1, rotation: 2 },
+  customTags: defaultFridgeTags,
 };
 
 // ============================================================
@@ -103,9 +130,14 @@ export async function fetchFridgeData(): Promise<{
           butterNoteText: settingsRes.data.butter_note_text || defaultFridgeSettings.butterNoteText,
           moodNoteText: settingsRes.data.mood_note_text || defaultFridgeSettings.moodNoteText,
           defaultAudioEnabled: settingsRes.data.default_audio_enabled ?? false,
+          notesScale: settingsRes.data.notes_scale || 1,
+          whiteboardPos: settingsRes.data.whiteboard_pos || defaultFridgeSettings.whiteboardPos,
           introNotePos: settingsRes.data.intro_note_pos || defaultFridgeSettings.introNotePos,
           butterNotePos: settingsRes.data.butter_note_pos || defaultFridgeSettings.butterNotePos,
           moodNotePos: settingsRes.data.mood_note_pos || defaultFridgeSettings.moodNotePos,
+          customTags: Array.isArray(settingsRes.data.custom_tags) && settingsRes.data.custom_tags.length > 0
+            ? settingsRes.data.custom_tags
+            : defaultFridgeTags,
         }
       : defaultFridgeSettings;
 
@@ -280,9 +312,12 @@ export async function saveFridgeSettingsToSupabase(settings: FridgeSettings): Pr
     butter_note_text: settings.butterNoteText,
     mood_note_text: settings.moodNoteText,
     default_audio_enabled: settings.defaultAudioEnabled,
+    notes_scale: settings.notesScale ?? 1,
+    whiteboard_pos: settings.whiteboardPos,
     intro_note_pos: settings.introNotePos,
     butter_note_pos: settings.butterNotePos,
     mood_note_pos: settings.moodNotePos,
+    custom_tags: settings.customTags,
     updated_at: new Date().toISOString(),
   };
 
@@ -334,9 +369,12 @@ export async function saveArrangedLayoutToSupabase(params: {
     promises.push(
       supabase.from("fridge_settings").upsert({
         id: "default",
+        notes_scale: params.settings.notesScale ?? 1,
+        whiteboard_pos: params.settings.whiteboardPos,
         intro_note_pos: params.settings.introNotePos,
         butter_note_pos: params.settings.butterNotePos,
         mood_note_pos: params.settings.moodNotePos,
+        custom_tags: params.settings.customTags,
         updated_at: new Date().toISOString(),
       }, { onConflict: "id" })
     );

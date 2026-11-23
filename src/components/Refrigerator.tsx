@@ -5,7 +5,7 @@ import { Recipe, Category, FridgeSettings } from "@/types";
 import { initialCategories } from "@/data/categories";
 import { initialRecipes } from "@/data/recipes";
 import { siteConfig } from "@/config/siteConfig";
-import { fetchFridgeData, defaultFridgeSettings } from "@/lib/supabase/api";
+import { fetchFridgeData, defaultFridgeSettings, defaultFridgeTags } from "@/lib/supabase/api";
 import { CategoryNote } from "./CategoryNote";
 import { DishNote } from "./DishNote";
 import { RecipeSheet } from "./RecipeSheet";
@@ -183,7 +183,7 @@ export const Refrigerator: React.FC = () => {
           width: "clamp(1000px, 160vw, 2400px)",
           height: "clamp(1000px, 160vw, 2400px)",
           aspectRatio: "1 / 1",
-          marginTop: "clamp(-330px, -18vw, -110px)",
+          marginTop: "clamp(-150px, -8vw, -50px)",
           containerType: "inline-size",
         }}
       >
@@ -233,14 +233,14 @@ export const Refrigerator: React.FC = () => {
           </button>
         </div>
 
-        {/* 2. Kitchen Whiteboard (MOUNTED ON FREEZER DOOR) */}
+        {/* 2. Kitchen Whiteboard (MOUNTED ON FREEZER DOOR - DYNAMICALLY POSITIONABLE) */}
         <div
-          className="absolute z-30"
+          className="absolute z-30 transition-all duration-300"
           style={{
-            left: "51.05%",
-            top: "22.8%",
+            left: `${settings.whiteboardPos?.x ?? 51.05}%`,
+            top: `${settings.whiteboardPos?.y ?? 22.8}%`,
             transform: "translateX(-50%)",
-            width: "29%",
+            width: `${settings.whiteboardPos?.width ?? 29}%`,
           }}
         >
           <KitchenWhiteboard
@@ -267,11 +267,11 @@ export const Refrigerator: React.FC = () => {
 
         {/* 3. Handwritten Intro Note ("A little taste of home") - Below Whiteboard on Freezer */}
         <div
-          className="absolute z-20 flex flex-col items-center"
+          className="absolute z-20 flex flex-col items-center transition-all duration-300"
           style={{
-            left: "48%",
-            top: "35.8%",
-            transform: "translateX(-50%) rotate(-1deg)",
+            left: `${settings.introNotePos?.x ?? 48}%`,
+            top: `${settings.introNotePos?.y ?? 35.8}%`,
+            transform: `translateX(-50%) rotate(${settings.introNotePos?.rotation ?? -1}deg) scale(${settings.introNotePos?.scale ?? 1})`,
             width: "19%",
           }}
         >
@@ -300,29 +300,45 @@ export const Refrigerator: React.FC = () => {
           </div>
         </div>
 
-        {/* 4. "Don't forget butter! 🧈" Note - Strictly inside right of freezer */}
-        <div
-          className="absolute z-20 pointer-events-none"
-          style={{
-            left: "60.5%",
-            top: "36.0%",
-            width: "5.5%",
-            transform: "rotate(3deg)",
-          }}
-        >
+        {/* 4. Dynamic Fridge Sticky Tags (Add / Remove / Edit in Visual Arranger) */}
+        {(settings.customTags && settings.customTags.length > 0 ? settings.customTags : defaultFridgeTags).map((tag) => (
           <div
-            className="relative bg-yellow-100 text-amber-950 font-handwriting font-bold rounded shadow-sm border border-amber-300 text-center"
+            key={tag.id}
+            className="absolute z-20 pointer-events-none transition-transform duration-200"
             style={{
-              fontSize: "clamp(9px, 0.85cqw, 13px)",
-              padding: "clamp(2px, 0.25cqw, 5px) clamp(4px, 0.4cqw, 8px)",
+              left: `${tag.xPos}%`,
+              top: `${tag.yPos}%`,
+              transform: `translate(-50%, -50%) rotate(${tag.rotation ?? 0}deg) scale(${tag.scale ?? 1})`,
+              transformOrigin: "center center",
             }}
           >
-            <div className="absolute -top-2 right-1">
-              <Magnet color="#ef4444" size="sm" shape="heart" />
+            <div
+              className="relative font-handwriting font-bold rounded shadow-sm border text-center whitespace-nowrap"
+              style={{
+                backgroundColor: tag.color || "#fef9c3",
+                borderColor: "rgba(0,0,0,0.12)",
+                color: "#1e293b",
+                fontSize: "clamp(9px, 0.85cqw, 13px)",
+                padding: "clamp(3px, 0.28cqw, 6px) clamp(6px, 0.55cqw, 12px)",
+              }}
+            >
+              <div className="absolute -top-2 right-1 pointer-events-none">
+                <Magnet color={tag.magnetColor || "#ef4444"} size="sm" shape="heart" />
+              </div>
+              <span className="leading-tight drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]">
+                {tag.text}
+              </span>
+              {tag.subText && (
+                <div
+                  className="font-normal opacity-80 mt-0.5"
+                  style={{ fontSize: "0.85em" }}
+                >
+                  {tag.subText}
+                </div>
+              )}
             </div>
-            <span>{settings.butterNoteText}</span>
           </div>
-        </div>
+        ))}
 
         {/* ============================================================ */}
         {/* ZONE B: LOWER FRIDGE DOOR (y: 45.0% to 95.0%, x: 34.4% to 67.7%) */}
@@ -457,29 +473,6 @@ export const Refrigerator: React.FC = () => {
           )}
         </div>
 
-        {/* 5. Decorative Mood Sticky Note on Bottom Right of Fridge Door */}
-        <div
-          className="absolute z-20 pointer-events-none"
-          style={{
-            left: "60%",
-            top: "83.5%",
-            width: "6.8%",
-            transform: "rotate(2deg)",
-          }}
-        >
-          <div
-            className="relative bg-rose-100 text-rose-950 font-handwriting font-bold rounded shadow-sm border border-rose-200 whitespace-nowrap text-center"
-            style={{
-              fontSize: "clamp(8.5px, 0.8cqw, 12px)",
-              padding: "clamp(2px, 0.2cqw, 4px) clamp(4px, 0.4cqw, 8px)",
-            }}
-          >
-            &ldquo;{settings.moodNoteText}&rdquo;
-            <div className="absolute -top-1.5 right-1">
-              <Magnet color="#ec4899" size="sm" shape="heart" />
-            </div>
-          </div>
-        </div>
 
       </div>
       {/* END 1:1 FRIDGE SCENE CONTAINER */}
