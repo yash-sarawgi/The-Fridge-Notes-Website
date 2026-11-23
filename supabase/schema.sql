@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
     y_pos REAL DEFAULT NULL,
     scale REAL DEFAULT 1,
     display_order INT DEFAULT 0,
+    is_hidden BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -53,6 +54,7 @@ CREATE TABLE IF NOT EXISTS public.recipes (
     storage_tips TEXT DEFAULT NULL,
     is_special BOOLEAN DEFAULT FALSE,
     is_favorite BOOLEAN DEFAULT FALSE,
+    is_hidden BOOLEAN DEFAULT FALSE,
     author_note TEXT DEFAULT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -67,9 +69,12 @@ CREATE TABLE IF NOT EXISTS public.fridge_settings (
     butter_note_text TEXT NOT NULL DEFAULT 'Butter! 🧈',
     mood_note_text TEXT NOT NULL DEFAULT 'Good food = Good mood 🍓',
     default_audio_enabled BOOLEAN DEFAULT FALSE,
-    intro_note_pos JSONB DEFAULT '{"x": 48, "y": 35.2, "scale": 1, "rotation": -1}'::jsonb,
-    butter_note_pos JSONB DEFAULT '{"x": 60.5, "y": 35.5, "scale": 1, "rotation": 3}'::jsonb,
-    mood_note_pos JSONB DEFAULT '{"x": 60, "y": 84.5, "scale": 1, "rotation": 2}'::jsonb,
+    notes_scale REAL DEFAULT 1,
+    whiteboard_pos JSONB DEFAULT '{"x": 51.05, "y": 22.8, "width": 29}'::jsonb,
+    intro_note_pos JSONB DEFAULT '{"x": 48, "y": 35.8, "scale": 1, "rotation": -1, "width": 19, "isHidden": false}'::jsonb,
+    butter_note_pos JSONB DEFAULT '{"x": 60.5, "y": 36.0, "scale": 1, "rotation": 3}'::jsonb,
+    mood_note_pos JSONB DEFAULT '{"x": 60, "y": 83.5, "scale": 1, "rotation": 2}'::jsonb,
+    custom_tags JSONB DEFAULT '[{"id":"tag-butter","text":"Butter! 🧈","color":"#fef9c3","magnetColor":"#ef4444","xPos":60.5,"yPos":36.0,"rotation":3,"scale":1},{"id":"tag-mood","text":"Good food = Good mood 🍓","color":"#ffe4e6","magnetColor":"#ec4899","xPos":60.0,"yPos":83.5,"rotation":2,"scale":1}]'::jsonb,
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
