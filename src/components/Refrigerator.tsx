@@ -183,7 +183,7 @@ export const Refrigerator: React.FC = () => {
           width: "clamp(1000px, 160vw, 2400px)",
           height: "clamp(1000px, 160vw, 2400px)",
           aspectRatio: "1 / 1",
-          marginTop: "clamp(-200px, -11vw, -60px)",
+          marginTop: "clamp(-330px, -18vw, -110px)",
           containerType: "inline-size",
         }}
       >
