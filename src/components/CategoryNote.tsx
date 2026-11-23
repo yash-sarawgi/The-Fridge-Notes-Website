@@ -62,12 +62,15 @@ export const CategoryNote: React.FC<CategoryNoteProps> = ({
     <button
       onClick={onClick}
       onMouseEnter={onHover}
-      className={`group relative text-left outline-none cursor-pointer transition-all duration-300 ease-out focus-visible:ring-2 focus-visible:ring-amber-500 rounded-xs w-full aspect-square p-2 sm:p-2.5 pt-3 sm:pt-3.5 pb-2 paper-shadow-md hover:paper-shadow-lifted flex flex-col justify-between ${
+      className={`group relative text-left outline-none cursor-pointer transition-all duration-300 ease-out focus-visible:ring-2 focus-visible:ring-amber-500 rounded-xs w-full aspect-square paper-shadow-md hover:paper-shadow-lifted flex flex-col justify-between ${
         isSelected ? "ring-2 ring-amber-600 scale-105" : "hover:-translate-y-1.5 hover:rotate-0"
       }`}
       style={{
         backgroundColor: category.color,
         transform: `rotate(${category.rotation}deg) scale(${category.scale || 1})`,
+        padding: "clamp(6px, 0.75cqw, 14px)",
+        paddingTop: "clamp(10px, 1.25cqw, 22px)",
+        paddingBottom: "clamp(6px, 0.7cqw, 12px)",
       }}
       aria-label={`Category: ${category.name}, ${recipeCount} recipes. Click to open.`}
     >
@@ -82,26 +85,38 @@ export const CategoryNote: React.FC<CategoryNoteProps> = ({
       {/* Note Header with handwritten title */}
       <div>
         <div className="flex items-center justify-between gap-1 mb-0.5">
-          <h3 className="font-handwriting text-xs sm:text-sm md:text-base font-bold text-[#2b1810] tracking-wide leading-tight group-hover:text-amber-900 transition-colors truncate">
+          <h3
+            className="font-handwriting font-bold text-[#2b1810] tracking-wide leading-tight group-hover:text-amber-900 transition-colors truncate"
+            style={{ fontSize: "clamp(11px, 1.2cqw, 20px)" }}
+          >
             {category.name}
           </h3>
           <span className="p-0.5 rounded-full bg-black/5 text-[#422517] group-hover:bg-black/10 transition-transform shrink-0">
-            <IconComponent className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </span>
         </div>
 
         {/* Description */}
-        <p className="font-handwriting text-[9px] sm:text-[11px] md:text-xs text-[#4b3327]/85 line-clamp-2 leading-snug">
+        <p
+          className="font-handwriting text-[#4b3327]/90 line-clamp-2 leading-snug"
+          style={{ fontSize: "clamp(9px, 0.9cqw, 14px)" }}
+        >
           {category.description}
         </p>
       </div>
 
       {/* Footer count tag / sticker */}
       <div className="flex items-center justify-between pt-1 border-t border-black/10 mt-auto">
-        <span className="font-handwriting text-[9px] sm:text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-white/70 text-[#3b2416] border border-black/5 shadow-xs">
+        <span
+          className="font-handwriting font-semibold px-1.5 py-0.5 rounded-full bg-white/75 text-[#3b2416] border border-black/5 shadow-xs"
+          style={{ fontSize: "clamp(8px, 0.8cqw, 12px)" }}
+        >
           {recipeCount} {recipeCount === 1 ? "recipe" : "recipes"}
         </span>
-        <span className="font-handwriting text-[10px] sm:text-[11px] font-bold text-[#6d4128] group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5">
+        <span
+          className="font-handwriting font-bold text-[#6d4128] group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5"
+          style={{ fontSize: "clamp(9px, 0.85cqw, 13px)" }}
+        >
           Open ➔
         </span>
       </div>

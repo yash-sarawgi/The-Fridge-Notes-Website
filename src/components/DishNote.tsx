@@ -84,17 +84,23 @@ export const DishNote: React.FC<DishNoteProps> = ({
         </div>
 
         {/* Polaroid handwritten caption below photo */}
-        <div className="pt-3 px-1 text-center">
-          <h4 className="font-handwriting text-xl sm:text-[22px] font-bold text-[#2a170e] leading-snug line-clamp-2 group-hover:text-amber-900 transition-colors">
+        <div className="pt-2 px-1 text-center">
+          <h4
+            className="font-handwriting font-bold text-[#2a170e] leading-snug line-clamp-2 group-hover:text-amber-900 transition-colors"
+            style={{ fontSize: "clamp(11px, 1.15cqw, 20px)" }}
+          >
             {recipe.title}
           </h4>
 
-          <div className="flex items-center justify-center gap-3 mt-1.5 text-xs text-[#5c4033]/80 font-handwriting font-medium">
-            <span className="flex items-center gap-1">
+          <div
+            className="flex items-center justify-center gap-2 mt-1 text-[#5c4033]/80 font-handwriting font-medium"
+            style={{ fontSize: "clamp(9px, 0.85cqw, 13px)" }}
+          >
+            <span className="flex items-center gap-0.5">
               <Clock className="w-3 h-3 text-amber-700" /> {recipe.totalTime}
             </span>
             <span>•</span>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-0.5">
               <ChefHat className="w-3 h-3 text-amber-700" /> {recipe.difficulty}
             </span>
           </div>
@@ -108,10 +114,12 @@ export const DishNote: React.FC<DishNoteProps> = ({
     <div
       onClick={onClick}
       onMouseEnter={onHover}
-      className="group relative cursor-pointer transition-all duration-300 ease-out outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm p-3.5 pt-4.5 pb-3.5 paper-shadow-md hover:paper-shadow-lifted hover:-translate-y-2 hover:rotate-0 w-full max-w-[200px] md:max-w-[220px]"
+      className="group relative cursor-pointer transition-all duration-300 ease-out outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm paper-shadow-md hover:paper-shadow-lifted hover:-translate-y-2 hover:rotate-0 w-full aspect-square flex flex-col justify-between"
       style={{
         backgroundColor: recipe.paperColor || "#fef08a",
         transform: `rotate(${rotation}deg)`,
+        padding: "clamp(6px, 0.75cqw, 14px)",
+        paddingTop: "clamp(10px, 1.2cqw, 20px)",
       }}
       tabIndex={0}
       role="button"
@@ -124,8 +132,8 @@ export const DishNote: React.FC<DishNoteProps> = ({
       }}
     >
       {/* Magnet at top */}
-      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-        <Magnet color={recipe.magnetColor || "#0284c7"} size="md" />
+      <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-20">
+        <Magnet color={recipe.magnetColor || "#0284c7"} size="sm" />
       </div>
 
       {/* Favorite Heart Pin */}
@@ -145,26 +153,36 @@ export const DishNote: React.FC<DishNoteProps> = ({
       </button>
 
       {/* Cute handwritten recipe title */}
-      <div className="mb-2">
-        <span className="text-[11px] font-handwriting uppercase tracking-wider text-black/60 font-bold block mb-0.5">
+      <div>
+        <span
+          className="font-handwriting uppercase tracking-wider text-black/60 font-bold block mb-0.5"
+          style={{ fontSize: "clamp(8px, 0.75cqw, 11px)" }}
+        >
           {recipe.categoryName} Note
         </span>
-        <h4 className="font-handwriting text-xl sm:text-2xl font-bold text-[#2b1810] leading-tight line-clamp-2 group-hover:text-amber-900 transition-colors">
+        <h4
+          className="font-handwriting font-bold text-[#2b1810] leading-tight line-clamp-2 group-hover:text-amber-900 transition-colors"
+          style={{ fontSize: "clamp(11px, 1.15cqw, 20px)" }}
+        >
           {recipe.title}
         </h4>
+        <p
+          className="font-handwriting text-[#4d3327]/85 line-clamp-2 leading-snug mt-1"
+          style={{ fontSize: "clamp(9px, 0.88cqw, 13px)" }}
+        >
+          {recipe.description}
+        </p>
       </div>
 
-      {/* Short preview snippet */}
-      <p className="font-handwriting text-xs sm:text-sm text-[#4d3327]/85 line-clamp-2 leading-snug mb-3">
-        {recipe.description}
-      </p>
-
       {/* Sticky note bottom details */}
-      <div className="pt-2 border-t border-black/10 flex items-center justify-between text-xs font-handwriting text-[#533525]">
-        <span className="flex items-center gap-1 font-semibold">
+      <div
+        className="pt-1 border-t border-black/10 flex items-center justify-between font-handwriting text-[#533525] mt-auto"
+        style={{ fontSize: "clamp(8.5px, 0.8cqw, 12px)" }}
+      >
+        <span className="flex items-center gap-0.5 font-semibold">
           <Clock className="w-3 h-3 text-amber-800" /> {recipe.totalTime}
         </span>
-        <span className="px-1.5 py-0.5 rounded-sm bg-black/5 font-bold text-[11px]">
+        <span className="px-1.5 py-0.5 rounded-sm bg-black/5 font-bold">
           {recipe.difficulty}
         </span>
       </div>

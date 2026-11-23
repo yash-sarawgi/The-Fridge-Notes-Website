@@ -173,16 +173,18 @@ export const Refrigerator: React.FC = () => {
 
       {/* ============================================================== */}
       {/* 1:1 RETRO FRIDGE SCENE CONTAINER                               */}
-      {/* Elegantly framed to natural 1:1 kitchen proportions so the     */}
-      {/* entire fridge, whiteboard, and sticky notes are visible.       */}
+      {/* Zoomed in prominently (160vw) as requested, with container    */}
+      {/* query scaling so EVERY element on the fridge door scales       */}
+      {/* dynamically with 100% proportional precision on any screen.    */}
       {/* ============================================================== */}
       <div
         className="relative flex-shrink-0"
         style={{
-          width: "min(100vw, 1150px)",
-          height: "min(100vw, 1150px)",
+          width: "clamp(1000px, 160vw, 2400px)",
+          height: "clamp(1000px, 160vw, 2400px)",
           aspectRatio: "1 / 1",
-          marginTop: "clamp(-45px, -3.5vw, -15px)",
+          marginTop: "clamp(-200px, -11vw, -60px)",
+          containerType: "inline-size",
         }}
       >
         {/* Real Kitchen Background Photo */}
@@ -213,12 +215,20 @@ export const Refrigerator: React.FC = () => {
             className="group cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-full transition-transform duration-300 hover:scale-105 active:scale-95"
             aria-label="Return to fridge home"
           >
-            <div className="px-4 py-1 sm:px-5 sm:py-1.5 rounded-full chrome-finish border-2 border-slate-300 shadow-xl flex items-center gap-1.5">
-              <Sparkles className="w-3 h-3 text-amber-500 fill-amber-400 flex-shrink-0" />
-              <span className="font-heading tracking-[0.2em] text-xs sm:text-sm uppercase font-extrabold text-slate-800 whitespace-nowrap drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]">
+            <div
+              className="rounded-full chrome-finish border-2 border-slate-300 shadow-xl flex items-center gap-1.5"
+              style={{
+                padding: "clamp(4px, 0.4cqw, 8px) clamp(10px, 1.1cqw, 20px)",
+              }}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400 flex-shrink-0" />
+              <span
+                className="font-heading tracking-[0.2em] uppercase font-extrabold text-slate-800 whitespace-nowrap drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]"
+                style={{ fontSize: "clamp(11px, 1.05cqw, 18px)" }}
+              >
                 {settings.badgeText}
               </span>
-              <Sparkles className="w-3 h-3 text-amber-500 fill-amber-400 flex-shrink-0" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400 flex-shrink-0" />
             </div>
           </button>
         </div>
@@ -230,7 +240,7 @@ export const Refrigerator: React.FC = () => {
             left: "51.05%",
             top: "22.8%",
             transform: "translateX(-50%)",
-            width: "clamp(260px, 29%, 340px)",
+            width: "29%",
           }}
         >
           <KitchenWhiteboard
@@ -260,24 +270,31 @@ export const Refrigerator: React.FC = () => {
           className="absolute z-20 flex flex-col items-center"
           style={{
             left: "48%",
-            top: "35.2%",
+            top: "35.8%",
             transform: "translateX(-50%) rotate(-1deg)",
-            width: "clamp(190px, 19%, 300px)",
+            width: "19%",
           }}
         >
           <div
-            className="relative px-3 py-1.5 sm:px-4 sm:py-2 bg-[#fefce8] text-[#2c1d11] rounded-xs paper-shadow-md border border-amber-200/90 text-center transition-transform duration-200 hover:rotate-0"
+            className="relative bg-[#fefce8] text-[#2c1d11] rounded-xs paper-shadow-md border border-amber-200/90 text-center transition-transform duration-200 hover:rotate-0"
             style={{
+              padding: "clamp(4px, 0.5cqw, 10px) clamp(6px, 0.8cqw, 16px)",
               clipPath: "polygon(0 0, 100% 0.5%, 99.5% 99.5%, 0.5% 100%)",
             }}
           >
             <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-30">
               <Magnet color="#dc2626" size="sm" shape="round" />
             </div>
-            <p className="font-handwriting text-sm sm:text-base font-bold leading-tight text-amber-950">
+            <p
+              className="font-handwriting font-bold leading-tight text-amber-950"
+              style={{ fontSize: "clamp(11px, 1.1cqw, 18px)" }}
+            >
               &ldquo;{settings.tagline}&rdquo;
             </p>
-            <p className="font-handwriting text-[11px] sm:text-xs text-amber-900/90 leading-snug mt-0.5 max-w-[210px] mx-auto">
+            <p
+              className="font-handwriting text-amber-900/90 leading-snug mt-0.5 mx-auto"
+              style={{ fontSize: "clamp(9px, 0.85cqw, 13px)" }}
+            >
               {settings.subIntro}
             </p>
           </div>
@@ -288,12 +305,18 @@ export const Refrigerator: React.FC = () => {
           className="absolute z-20 pointer-events-none"
           style={{
             left: "60.5%",
-            top: "35.5%",
-            width: "clamp(50px, 5.5%, 80px)",
+            top: "36.0%",
+            width: "5.5%",
             transform: "rotate(3deg)",
           }}
         >
-          <div className="relative px-2 py-1 bg-yellow-100 text-amber-950 font-handwriting text-[10px] sm:text-xs font-bold rounded shadow-sm border border-amber-300 text-center">
+          <div
+            className="relative bg-yellow-100 text-amber-950 font-handwriting font-bold rounded shadow-sm border border-amber-300 text-center"
+            style={{
+              fontSize: "clamp(9px, 0.85cqw, 13px)",
+              padding: "clamp(2px, 0.25cqw, 5px) clamp(4px, 0.4cqw, 8px)",
+            }}
+          >
             <div className="absolute -top-2 right-1">
               <Magnet color="#ef4444" size="sm" shape="heart" />
             </div>
@@ -311,7 +334,7 @@ export const Refrigerator: React.FC = () => {
           className="absolute z-20"
           style={{
             left: "51.05%",
-            top: "50.2%",
+            top: "50.0%",
             transform: "translateX(-50%)",
             width: "30.5%",
           }}
@@ -378,7 +401,7 @@ export const Refrigerator: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                <div className="w-full grid grid-cols-2 sm:grid-cols-3 gap-2.5 justify-items-center pt-2">
+                <div className="w-full grid grid-cols-2 sm:grid-cols-3 gap-[0.7cqw] justify-items-center pt-2">
                   {displayedRecipes.map((dish) => (
                     <DishNote
                       key={dish.id}
@@ -395,15 +418,21 @@ export const Refrigerator: React.FC = () => {
 
             /* VIEW 3: HOMEPAGE 9 CATEGORY NOTES (Strictly 3x3 grid = 100% on fridge door) */
             <div className="w-full flex flex-col items-center pb-6">
-              <div className="text-center mb-2">
-                <span className="font-handwriting text-xs font-bold text-amber-950 px-2.5 py-0.5 bg-amber-100/90 rounded-full border border-amber-300 shadow-sm inline-block">
+              <div className="text-center mb-[0.6cqw]">
+                <span
+                  className="font-handwriting font-bold text-amber-950 rounded-full border border-amber-300/80 shadow-xs inline-block bg-amber-100/90"
+                  style={{
+                    fontSize: "clamp(9px, 0.9cqw, 15px)",
+                    padding: "clamp(2px, 0.2cqw, 4px) clamp(8px, 0.8cqw, 14px)",
+                  }}
+                >
                   ✨ Pick a category sticky note to explore recipes ✨
                 </span>
               </div>
 
-              {/* Strict 3-Column Grid: 9 notes in 3 rows fits cleanly on the door! */}
+              {/* Strict 3-Column Grid: 9 square notes in 3 rows fits cleanly on the door! */}
               <div
-                className="w-full grid grid-cols-3 gap-2 sm:gap-2.5 justify-items-center pt-1 transition-transform"
+                className="w-full grid grid-cols-3 gap-[0.7cqw] justify-items-center pt-1 transition-transform"
                 style={{
                   transform: `scale(${settings.notesScale || 1})`,
                   transformOrigin: "top center",
@@ -433,12 +462,18 @@ export const Refrigerator: React.FC = () => {
           className="absolute z-20 pointer-events-none"
           style={{
             left: "60%",
-            top: "82.5%",
-            width: "clamp(55px, 6.8%, 80px)",
+            top: "83.5%",
+            width: "6.8%",
             transform: "rotate(2deg)",
           }}
         >
-          <div className="relative px-2 py-1 bg-rose-100 text-rose-950 font-handwriting text-[10px] sm:text-xs font-bold rounded shadow-sm border border-rose-200 whitespace-nowrap text-center">
+          <div
+            className="relative bg-rose-100 text-rose-950 font-handwriting font-bold rounded shadow-sm border border-rose-200 whitespace-nowrap text-center"
+            style={{
+              fontSize: "clamp(8.5px, 0.8cqw, 12px)",
+              padding: "clamp(2px, 0.2cqw, 4px) clamp(4px, 0.4cqw, 8px)",
+            }}
+          >
             &ldquo;{settings.moodNoteText}&rdquo;
             <div className="absolute -top-1.5 right-1">
               <Magnet color="#ec4899" size="sm" shape="heart" />
