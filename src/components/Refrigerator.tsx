@@ -275,39 +275,41 @@ export const Refrigerator: React.FC = () => {
         </div>
 
         {/* 3. Handwritten Intro Note ("A little taste of home") - Below Whiteboard on Freezer */}
-        <div
-          className="absolute z-20 flex flex-col items-center transition-all duration-300"
-          style={{
-            left: `${settings.introNotePos?.x ?? 48}%`,
-            top: `${settings.introNotePos?.y ?? 35.8}%`,
-            transform: `translateX(-50%) rotate(${settings.introNotePos?.rotation ?? -1}deg) scale(${settings.introNotePos?.scale ?? 1})`,
-            width: "19%",
-          }}
-        >
+        {!settings.introNotePos?.isHidden && (
           <div
-            className="relative bg-[#fefce8] text-[#2c1d11] rounded-xs paper-shadow-md border border-amber-200/90 text-center transition-transform duration-200 hover:rotate-0"
+            className="absolute z-20 flex flex-col items-center transition-all duration-300"
             style={{
-              padding: "clamp(6px, 0.7cqw, 14px) clamp(10px, 1.1cqw, 22px)",
-              clipPath: "polygon(0 0, 100% 0.5%, 99.5% 99.5%, 0.5% 100%)",
+              left: `${settings.introNotePos?.x ?? 48}%`,
+              top: `${settings.introNotePos?.y ?? 35.8}%`,
+              transform: `translateX(-50%) rotate(${settings.introNotePos?.rotation ?? -1}deg) scale(${settings.introNotePos?.scale ?? 1})`,
+              width: `${settings.introNotePos?.width ?? 19}%`,
             }}
           >
-            <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-30">
-              <Magnet color="#dc2626" size="sm" shape="round" />
+            <div
+              className="relative bg-[#fefce8] text-[#2c1d11] rounded-xs paper-shadow-md border border-amber-200/90 text-center transition-transform duration-200 hover:rotate-0 w-full"
+              style={{
+                padding: "clamp(6px, 0.7cqw, 14px) clamp(10px, 1.1cqw, 22px)",
+                clipPath: "polygon(0 0, 100% 0.5%, 99.5% 99.5%, 0.5% 100%)",
+              }}
+            >
+              <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-30">
+                <Magnet color="#dc2626" size="sm" shape="round" />
+              </div>
+              <p
+                className="font-handwriting font-bold leading-tight text-amber-950"
+                style={{ fontSize: "clamp(14px, 1.5cqw, 26px)" }}
+              >
+                &ldquo;{settings.tagline}&rdquo;
+              </p>
+              <p
+                className="font-handwriting text-amber-900/90 leading-snug mt-1 mx-auto"
+                style={{ fontSize: "clamp(11px, 1.15cqw, 18px)" }}
+              >
+                {settings.subIntro}
+              </p>
             </div>
-            <p
-              className="font-handwriting font-bold leading-tight text-amber-950"
-              style={{ fontSize: "clamp(14px, 1.5cqw, 26px)" }}
-            >
-              &ldquo;{settings.tagline}&rdquo;
-            </p>
-            <p
-              className="font-handwriting text-amber-900/90 leading-snug mt-1 mx-auto"
-              style={{ fontSize: "clamp(11px, 1.15cqw, 18px)" }}
-            >
-              {settings.subIntro}
-            </p>
           </div>
-        </div>
+        )}
 
         {/* 4. Dynamic Fridge Sticky Tags (Add / Remove / Edit in Visual Arranger) */}
         {visibleTags.map((tag) => (

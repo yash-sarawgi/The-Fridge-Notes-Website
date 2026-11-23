@@ -32,6 +32,7 @@ import {
   Trash2,
   Tag,
   ClipboardList,
+  FileText,
   Eye,
   EyeOff,
   LayoutGrid,
@@ -67,7 +68,7 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
 }) => {
   const [categories, setCategories] = useState<Category[]>(initialCategoriesProp);
   const [settings, setSettings] = useState<FridgeSettings>(initialSettingsProp);
-  const [activeTab, setActiveTab] = useState<"categories" | "whiteboard" | "tags">("categories");
+  const [activeTab, setActiveTab] = useState<"categories" | "whiteboard" | "intro" | "tags">("categories");
 
   // Selected Category
   const [selectedCatId, setSelectedCatId] = useState<string>(categories[0]?.id || "sandwiches");
@@ -163,6 +164,32 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
         x: updates.x ?? prev.whiteboardPos?.x ?? 51.05,
         y: updates.y ?? prev.whiteboardPos?.y ?? 22.8,
         width: updates.width ?? prev.whiteboardPos?.width ?? 29,
+      },
+    }));
+  };
+
+  // Intro Note ("A little taste of home") Updates
+  const currentIntroNotePos = {
+    x: settings.introNotePos?.x ?? 48,
+    y: settings.introNotePos?.y ?? 35.8,
+    scale: settings.introNotePos?.scale ?? 1,
+    rotation: settings.introNotePos?.rotation ?? -1,
+    width: settings.introNotePos?.width ?? 19,
+    isHidden: settings.introNotePos?.isHidden ?? false,
+  };
+
+  const updateIntroNotePos = (
+    updates: Partial<{ x: number; y: number; scale: number; rotation: number; width: number; isHidden: boolean }>
+  ) => {
+    setSettings((prev) => ({
+      ...prev,
+      introNotePos: {
+        x: updates.x ?? prev.introNotePos?.x ?? 48,
+        y: updates.y ?? prev.introNotePos?.y ?? 35.8,
+        scale: updates.scale ?? prev.introNotePos?.scale ?? 1,
+        rotation: updates.rotation ?? prev.introNotePos?.rotation ?? -1,
+        width: updates.width ?? prev.introNotePos?.width ?? 19,
+        isHidden: updates.isHidden ?? prev.introNotePos?.isHidden ?? false,
       },
     }));
   };
@@ -433,20 +460,42 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
               </div>
             </div>
 
-            {/* Intro Tagline Note */}
+            {/* Intro Tagline Note (Interactive, Movable & Editable) */}
             <div
-              className="absolute z-20 pointer-events-none"
+              onClick={() => setActiveTab("intro")}
+              className={`absolute z-20 cursor-pointer transition-all ${
+                activeTab === "intro"
+                  ? "ring-2 ring-sky-400 ring-offset-1 ring-offset-slate-900 shadow-xl scale-105"
+                  : "hover:scale-[1.02]"
+              } ${currentIntroNotePos.isHidden ? "opacity-50" : ""}`}
               style={{
-                left: "48%",
-                top: "35.8%",
-                transform: "translateX(-50%) rotate(-1deg)",
-                width: "19%",
+                left: `${currentIntroNotePos.x}%`,
+                top: `${currentIntroNotePos.y}%`,
+                transform: `translateX(-50%) rotate(${currentIntroNotePos.rotation}deg) scale(${currentIntroNotePos.scale})`,
+                width: `${currentIntroNotePos.width}%`,
               }}
             >
-              <div className="bg-[#fefce8] p-1 rounded-xs border border-amber-200 text-center shadow-xs">
-                <p className="text-[9px] font-bold text-amber-950 leading-tight truncate">
+              <div
+                className={`relative bg-[#fefce8] p-1.5 rounded-xs border text-center shadow-xs ${
+                  currentIntroNotePos.isHidden ? "border-dashed border-amber-500" : "border-amber-200"
+                }`}
+              >
+                <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 pointer-events-none">
+                  <Magnet color="#dc2626" size="sm" shape="round" />
+                </div>
+                {currentIntroNotePos.isHidden && (
+                  <span className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 font-mono text-[6.5px] font-black px-1 rounded uppercase tracking-wider">
+                    Hidden
+                  </span>
+                )}
+                <p className="text-[9.5px] font-bold text-amber-950 leading-tight truncate">
                   &ldquo;{settings.tagline}&rdquo;
                 </p>
+                {settings.subIntro && (
+                  <p className="text-[7px] text-amber-900/80 leading-tight truncate mt-0.5">
+                    {settings.subIntro}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -623,25 +672,36 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
             </button>
             <button
               onClick={() => setActiveTab("whiteboard")}
-              className={`flex-1 py-1.5 px-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+              className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold flex items-center justify-center gap-1 transition-all ${
                 activeTab === "whiteboard"
                   ? "bg-sky-500 text-slate-950 shadow"
                   : "text-slate-400 hover:text-white"
               }`}
             >
               <ClipboardList className="w-3.5 h-3.5" />
-              Kitchen Board
+              Whiteboard
+            </button>
+            <button
+              onClick={() => setActiveTab("intro")}
+              className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold flex items-center justify-center gap-1 transition-all ${
+                activeTab === "intro"
+                  ? "bg-sky-500 text-slate-950 shadow"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5" />
+              Intro Note
             </button>
             <button
               onClick={() => setActiveTab("tags")}
-              className={`flex-1 py-1.5 px-2 rounded-lg font-bold flex items-center justify-center gap-1.5 transition-all ${
+              className={`flex-1 py-1.5 px-1.5 rounded-lg font-bold flex items-center justify-center gap-1 transition-all ${
                 activeTab === "tags"
                   ? "bg-sky-500 text-slate-950 shadow"
                   : "text-slate-400 hover:text-white"
               }`}
             >
               <Tag className="w-3.5 h-3.5" />
-              Sticky Tags ({currentTags.length})
+              Tags ({currentTags.length})
             </button>
           </div>
 
@@ -946,7 +1006,190 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
             </div>
           )}
 
-          {/* TAB 3: FRIDGE STICKY TAGS (ADD / REMOVE / EDIT) */}
+          {/* TAB 3: INTRO NOTE EDITING */}
+          {activeTab === "intro" && (
+            <div className="space-y-4 text-xs">
+              <div>
+                <h4 className="font-bold text-white text-sm flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-amber-400" />
+                  Intro Note (&ldquo;{settings.tagline}&rdquo;)
+                </h4>
+                <p className="text-slate-400 text-xs mt-0.5">
+                  Edit the handwritten quote note, adjust its placement, tilt, scale, or toggle visibility.
+                </p>
+              </div>
+
+              {/* Hide / Unhide Toggle */}
+              <div className="flex items-center justify-between p-2.5 bg-slate-950 border border-slate-800 rounded-xl">
+                <div className="flex items-center gap-2">
+                  {currentIntroNotePos.isHidden ? (
+                    <EyeOff className="w-4 h-4 text-amber-400 shrink-0" />
+                  ) : (
+                    <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
+                  )}
+                  <div>
+                    <span className="font-semibold text-slate-200 block text-xs">
+                      {currentIntroNotePos.isHidden ? "Hidden from Fridge" : "Visible on Fridge"}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block">
+                      {currentIntroNotePos.isHidden
+                        ? "Draft mode (not displayed to visitors)"
+                        : "Pinned on freezer with red magnet"}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => updateIntroNotePos({ isHidden: !currentIntroNotePos.isHidden })}
+                  className={`px-2.5 py-1 rounded text-xs font-semibold transition-all shrink-0 ${
+                    currentIntroNotePos.isHidden
+                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30"
+                      : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30"
+                  }`}
+                >
+                  {currentIntroNotePos.isHidden ? "Unhide" : "Hide Note"}
+                </button>
+              </div>
+
+              {/* Text Inputs */}
+              <div className="space-y-3 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                <div>
+                  <label className="font-semibold text-slate-300 block mb-1">Tagline Quote *</label>
+                  <input
+                    type="text"
+                    value={settings.tagline}
+                    onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
+                    className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                    placeholder="e.g. A little taste of home"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-semibold text-slate-300 block mb-1">Sub-Intro Description</label>
+                  <textarea
+                    rows={2}
+                    value={settings.subIntro}
+                    onChange={(e) => setSettings({ ...settings, subIntro: e.target.value })}
+                    className="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-white text-xs focus:ring-1 focus:ring-amber-500 focus:outline-none"
+                    placeholder="e.g. Recipes, experiments and things worth making again."
+                  />
+                </div>
+              </div>
+
+              {/* Position and Scale Sliders */}
+              <div className="space-y-3 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                <div>
+                  <div className="flex justify-between text-slate-300 mb-1">
+                    <span>Vertical Position (Y %)</span>
+                    <span className="font-mono text-amber-400 font-bold">{currentIntroNotePos.y.toFixed(1)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="18.0"
+                    max="85.0"
+                    step="0.5"
+                    value={currentIntroNotePos.y}
+                    onChange={(e) => updateIntroNotePos({ y: parseFloat(e.target.value) })}
+                    className="w-full accent-amber-400 cursor-pointer"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-slate-300 mb-1">
+                    <span>Horizontal Center (X %)</span>
+                    <span className="font-mono text-amber-400 font-bold">{currentIntroNotePos.x.toFixed(1)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="36.0"
+                    max="65.0"
+                    step="0.5"
+                    value={currentIntroNotePos.x}
+                    onChange={(e) => updateIntroNotePos({ x: parseFloat(e.target.value) })}
+                    className="w-full accent-amber-400 cursor-pointer"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <div className="flex justify-between text-slate-300 mb-1">
+                      <span>Width (%)</span>
+                      <span className="font-mono text-amber-400 font-bold">{currentIntroNotePos.width}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="14"
+                      max="28"
+                      step="1"
+                      value={currentIntroNotePos.width}
+                      onChange={(e) => updateIntroNotePos({ width: parseInt(e.target.value) })}
+                      className="w-full accent-amber-400 cursor-pointer"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-slate-300 mb-1">
+                      <span>Tilt (deg)</span>
+                      <span className="font-mono text-amber-400 font-bold">{currentIntroNotePos.rotation}°</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="-10"
+                      max="10"
+                      step="0.5"
+                      value={currentIntroNotePos.rotation}
+                      onChange={(e) => updateIntroNotePos({ rotation: parseFloat(e.target.value) })}
+                      className="w-full accent-amber-400 cursor-pointer"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-slate-300 mb-1">
+                    <span>Note Scale</span>
+                    <span className="font-mono text-amber-400 font-bold">{Math.round(currentIntroNotePos.scale * 100)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.75"
+                    max="1.35"
+                    step="0.05"
+                    value={currentIntroNotePos.scale}
+                    onChange={(e) => updateIntroNotePos({ scale: parseFloat(e.target.value) })}
+                    className="w-full accent-amber-400 cursor-pointer"
+                  />
+                </div>
+
+                {/* Quick Presets */}
+                <div className="flex items-center gap-1.5 pt-2 border-t border-slate-800">
+                  <span className="text-[10px] text-slate-400">Presets:</span>
+                  <button
+                    type="button"
+                    onClick={() => updateIntroNotePos({ x: 48, y: 35.8, scale: 1, rotation: -1, width: 19 })}
+                    className="px-2 py-0.5 text-[10px] text-slate-300 bg-slate-900 hover:text-white rounded border border-slate-700"
+                  >
+                    Below Board
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateIntroNotePos({ x: 51.05, y: 36.5, scale: 1, rotation: 0, width: 22 })}
+                    className="px-2 py-0.5 text-[10px] text-slate-300 bg-slate-900 hover:text-white rounded border border-slate-700"
+                  >
+                    Centered
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateIntroNotePos({ x: 58, y: 37, scale: 0.95, rotation: 2, width: 18 })}
+                    className="px-2 py-0.5 text-[10px] text-slate-300 bg-slate-900 hover:text-white rounded border border-slate-700"
+                  >
+                    Right Shift
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: FRIDGE STICKY TAGS (ADD / REMOVE / EDIT) */}
           {activeTab === "tags" && (
             <div className="space-y-4 text-xs">
               <div className="flex items-center justify-between">

@@ -79,7 +79,7 @@ export interface FridgeSettings {
   defaultAudioEnabled: boolean;
   notesScale?: number;
   whiteboardPos?: { x: number; y: number; width?: number };
-  introNotePos?: { x: number; y: number; scale?: number; rotation?: number };
+  introNotePos?: { x: number; y: number; scale?: number; rotation?: number; width?: number; isHidden?: boolean };
   butterNotePos?: { x: number; y: number; scale?: number; rotation?: number };
   moodNotePos?: { x: number; y: number; scale?: number; rotation?: number };
   customTags?: FridgeTag[];

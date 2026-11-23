@@ -39,7 +39,7 @@ export const defaultFridgeSettings: FridgeSettings = {
   defaultAudioEnabled: siteConfig.defaultAudioEnabled,
   notesScale: 1,
   whiteboardPos: { x: 51.05, y: 22.8, width: 29 },
-  introNotePos: { x: 48, y: 35.8, scale: 1, rotation: -1 },
+  introNotePos: { x: 48, y: 35.8, scale: 1, rotation: -1, width: 19, isHidden: false },
   butterNotePos: { x: 60.5, y: 36.0, scale: 1, rotation: 3 },
   moodNotePos: { x: 60, y: 83.5, scale: 1, rotation: 2 },
   customTags: defaultFridgeTags,
@@ -374,6 +374,8 @@ export async function saveArrangedLayoutToSupabase(params: {
     promises.push(
       supabase.from("fridge_settings").upsert({
         id: "default",
+        tagline: params.settings.tagline,
+        sub_intro: params.settings.subIntro,
         notes_scale: params.settings.notesScale ?? 1,
         whiteboard_pos: params.settings.whiteboardPos,
         intro_note_pos: params.settings.introNotePos,
