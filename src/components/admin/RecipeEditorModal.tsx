@@ -13,6 +13,8 @@ import {
   Star,
   Clock,
   Users,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 interface RecipeEditorModalProps {
@@ -48,6 +50,7 @@ export const RecipeEditorModal: React.FC<RecipeEditorModalProps> = ({
   const [magnetColor, setMagnetColor] = useState("#ef4444");
   const [isFavorite, setIsFavorite] = useState(false);
   const [isSpecial, setIsSpecial] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [storageTips, setStorageTips] = useState("");
   const [authorNote, setAuthorNote] = useState("");
 
@@ -79,6 +82,7 @@ export const RecipeEditorModal: React.FC<RecipeEditorModalProps> = ({
       setMagnetColor(recipe.magnetColor || "#ef4444");
       setIsFavorite(recipe.isFavorite || false);
       setIsSpecial(recipe.isSpecial || false);
+      setIsHidden(recipe.isHidden || false);
       setStorageTips(recipe.storageTips || "");
       setAuthorNote(recipe.authorNote || "");
       setIngredients(
@@ -114,6 +118,7 @@ export const RecipeEditorModal: React.FC<RecipeEditorModalProps> = ({
       setMagnetColor("#ef4444");
       setIsFavorite(false);
       setIsSpecial(false);
+      setIsHidden(false);
       setStorageTips("");
       setAuthorNote("");
       setIngredients([
@@ -171,6 +176,7 @@ export const RecipeEditorModal: React.FC<RecipeEditorModalProps> = ({
       magnetColor,
       isFavorite,
       isSpecial,
+      isHidden,
       storageTips: storageTips.trim() || undefined,
       authorNote: authorNote.trim() || undefined,
       ingredients: ingredients.filter((i) => i.item.trim().length > 0),
@@ -226,6 +232,38 @@ export const RecipeEditorModal: React.FC<RecipeEditorModalProps> = ({
         <form onSubmit={handleSave} className="p-6 overflow-y-auto space-y-6 flex-1 text-sm">
           {/* Main Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Visibility Hide/Unhide Toggle */}
+            <div className="md:col-span-2 flex items-center justify-between p-3.5 bg-slate-950 border border-slate-800 rounded-xl">
+              <div className="flex items-center gap-2.5">
+                {isHidden ? (
+                  <EyeOff className="w-4 h-4 text-amber-400 shrink-0" />
+                ) : (
+                  <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
+                )}
+                <div>
+                  <span className="font-semibold text-slate-200 block text-xs">
+                    {isHidden ? "Hidden from Public Fridge (Draft Mode)" : "Visible on Public Fridge"}
+                  </span>
+                  <span className="text-[11px] text-slate-400 block">
+                    {isHidden
+                      ? "Keep working on this recipe privately — visitors won't see it on the fridge until you unhide."
+                      : "Visitors can browse, search, and view this recipe note on the fridge."}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsHidden(!isHidden)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shrink-0 ${
+                  isHidden
+                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30"
+                    : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30"
+                }`}
+              >
+                {isHidden ? "Unhide Recipe" : "Hide Recipe"}
+              </button>
+            </div>
+
             <div className="md:col-span-2">
               <label className="block text-xs font-semibold text-slate-300 mb-1">
                 Recipe Title *

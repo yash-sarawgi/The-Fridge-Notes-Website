@@ -58,6 +58,8 @@ export const CategoryNote: React.FC<CategoryNoteProps> = ({
     }
   };
 
+  const scale = Math.max(0.8, Math.min(1.3, category.scale || 1));
+
   return (
     <button
       onClick={onClick}
@@ -87,7 +89,7 @@ export const CategoryNote: React.FC<CategoryNoteProps> = ({
         <div className="flex items-center justify-between gap-1 mb-0.5">
           <h3
             className="font-handwriting font-bold text-[#2b1810] tracking-wide leading-tight group-hover:text-amber-900 transition-colors truncate"
-            style={{ fontSize: "clamp(11px, 1.2cqw, 20px)" }}
+            style={{ fontSize: `calc(clamp(11px, 1.2cqw, 20px) * ${scale})` }}
           >
             {category.name}
           </h3>
@@ -99,7 +101,7 @@ export const CategoryNote: React.FC<CategoryNoteProps> = ({
         {/* Description */}
         <p
           className="font-handwriting text-[#4b3327]/90 line-clamp-2 leading-snug"
-          style={{ fontSize: "clamp(9px, 0.9cqw, 14px)" }}
+          style={{ fontSize: `calc(clamp(9px, 0.9cqw, 14px) * ${scale})` }}
         >
           {category.description}
         </p>
@@ -109,13 +111,13 @@ export const CategoryNote: React.FC<CategoryNoteProps> = ({
       <div className="flex items-center justify-between pt-1 border-t border-black/10 mt-auto">
         <span
           className="font-handwriting font-semibold px-1.5 py-0.5 rounded-full bg-white/75 text-[#3b2416] border border-black/5 shadow-xs"
-          style={{ fontSize: "clamp(8px, 0.8cqw, 12px)" }}
+          style={{ fontSize: `calc(clamp(8px, 0.8cqw, 12px) * ${scale})` }}
         >
           {recipeCount} {recipeCount === 1 ? "recipe" : "recipes"}
         </span>
         <span
           className="font-handwriting font-bold text-[#6d4128] group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5"
-          style={{ fontSize: "clamp(9px, 0.85cqw, 13px)" }}
+          style={{ fontSize: `calc(clamp(9px, 0.85cqw, 13px) * ${scale})` }}
         >
           Open ➔
         </span>

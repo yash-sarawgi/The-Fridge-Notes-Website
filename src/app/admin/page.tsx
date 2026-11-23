@@ -39,6 +39,8 @@ import {
   Database,
   AlertCircle,
   HelpCircle,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 type ActiveTab = "arranger" | "recipes" | "categories" | "settings";
@@ -234,6 +236,13 @@ export default function AdminPage() {
     showToast(updated.isFavorite ? "Added to favorites ❤️" : "Removed from favorites");
   };
 
+  const handleToggleHiddenRecipe = async (recipe: Recipe) => {
+    const updated = { ...recipe, isHidden: !recipe.isHidden };
+    await saveRecipeToSupabase(updated);
+    setRecipes((prev) => prev.map((r) => (r.id === recipe.id ? updated : r)));
+    showToast(updated.isHidden ? `"${recipe.title}" is now hidden from fridge` : `"${recipe.title}" is now visible`);
+  };
+
   // Category Operations
   const handleSaveCategory = async (saved: Category) => {
     await saveCategoryToSupabase(saved);
@@ -247,6 +256,13 @@ export default function AdminPage() {
       return [...prev, saved];
     });
     showToast(`Category "${saved.name}" saved!`);
+  };
+
+  const handleToggleHiddenCategory = async (cat: Category) => {
+    const updated = { ...cat, isHidden: !cat.isHidden };
+    await saveCategoryToSupabase(updated);
+    setCategories((prev) => prev.map((c) => (c.id === cat.id ? updated : c)));
+    showToast(updated.isHidden ? `"${cat.name}" hidden from public fridge` : `"${cat.name}" is now visible`);
   };
 
   const handleDeleteCategory = async (id: string, name: string) => {
@@ -610,10 +626,32 @@ export default function AdminPage() {
                 >
                   <div>
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-sky-950/60 text-sky-400 border border-sky-800/40">
-                        {recipe.categoryName}
-                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-sky-950/60 text-sky-400 border border-sky-800/40">
+                          {recipe.categoryName}
+                        </span>
+                        {recipe.isHidden && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                            Hidden (Draft)
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleToggleHiddenRecipe(recipe)}
+                          className={`p-1 rounded transition-colors ${
+                            recipe.isHidden
+                              ? "text-amber-400 hover:text-amber-300 bg-amber-950/40"
+                              : "text-slate-500 hover:text-emerald-400"
+                          }`}
+                          title={recipe.isHidden ? "Hidden from public fridge. Click to unhide." : "Visible on fridge. Click to hide (draft mode)."}
+                        >
+                          {recipe.isHidden ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
+                        </button>
                         <button
                           onClick={() => handleToggleFavorite(recipe)}
                           className="p-1 text-slate-500 hover:text-pink-400 transition-colors"
@@ -729,8 +767,15 @@ export default function AdminPage() {
                         className="w-3 h-3 rounded-full shadow"
                       />
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-white">{c.name}</h4>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <h4 className="text-sm font-bold text-white">{c.name}</h4>
+                        {c.isHidden && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                            Hidden
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-slate-400 mt-0.5">{c.description}</p>
                       <p className="text-[11px] font-mono text-slate-500 mt-1">
                         {recipes.filter((r) => r.categoryId === c.id).length} recipes
@@ -739,6 +784,18 @@ export default function AdminPage() {
                   </div>
 
                   <div className="flex items-center justify-end gap-2 mt-4 pt-2 border-t border-slate-800">
+                    <button
+                      onClick={() => handleToggleHiddenCategory(c)}
+                      className={`flex items-center gap-1 px-2.5 py-1 text-xs rounded transition-colors ${
+                        c.isHidden
+                          ? "text-amber-400 hover:text-amber-300 bg-amber-950/40"
+                          : "text-slate-400 hover:text-emerald-400"
+                      }`}
+                      title={c.isHidden ? "Hidden from fridge. Click to unhide." : "Visible on fridge. Click to hide."}
+                    >
+                      {c.isHidden ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                      <span>{c.isHidden ? "Unhide" : "Hide"}</span>
+                    </button>
                     <button
                       onClick={() => {
                         setEditingCategory(c);

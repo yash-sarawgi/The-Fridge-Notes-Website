@@ -140,8 +140,17 @@ export const Refrigerator: React.FC = () => {
     }
   };
 
+  // Active Visible Entities (Hidden items can be drafted/tested in CMS without public exposure)
+  const visibleCategories = categories.filter((c) => !c.isHidden);
+  const visibleRecipes = recipes.filter((r) => !r.isHidden);
+  const visibleTags = (
+    settings.customTags && settings.customTags.length > 0
+      ? settings.customTags
+      : defaultFridgeTags
+  ).filter((t) => !t.isHidden);
+
   // Filtered dishes
-  const displayedRecipes = recipes.filter((r) => {
+  const displayedRecipes = visibleRecipes.filter((r) => {
     if (selectedCategoryId && !searchQuery) {
       if (r.categoryId !== selectedCategoryId) return false;
     }
@@ -166,7 +175,7 @@ export const Refrigerator: React.FC = () => {
     return true;
   });
 
-  const selectedCategoryObj = categories.find((c) => c.id === selectedCategoryId);
+  const selectedCategoryObj = visibleCategories.find((c) => c.id === selectedCategoryId);
 
   return (
     <div className="relative w-full min-h-screen bg-[#ea7317] overflow-x-hidden flex flex-col items-center select-none">
@@ -183,7 +192,7 @@ export const Refrigerator: React.FC = () => {
           width: "clamp(1000px, 160vw, 2400px)",
           height: "clamp(1000px, 160vw, 2400px)",
           aspectRatio: "1 / 1",
-          marginTop: "clamp(-150px, -8vw, -50px)",
+          marginTop: "clamp(-270px, -15vw, -90px)",
           containerType: "inline-size",
         }}
       >
@@ -260,7 +269,7 @@ export const Refrigerator: React.FC = () => {
               playMagnetClick(!soundEnabled);
             }}
             onOpenAdmin={() => setIsAdminOpen(true)}
-            totalRecipesCount={recipes.length}
+            totalRecipesCount={visibleRecipes.length}
             currentDisplayCount={displayedRecipes.length}
           />
         </div>
@@ -301,7 +310,7 @@ export const Refrigerator: React.FC = () => {
         </div>
 
         {/* 4. Dynamic Fridge Sticky Tags (Add / Remove / Edit in Visual Arranger) */}
-        {(settings.customTags && settings.customTags.length > 0 ? settings.customTags : defaultFridgeTags).map((tag) => (
+        {visibleTags.map((tag) => (
           <div
             key={tag.id}
             className="absolute z-20 pointer-events-none transition-transform duration-200"
@@ -318,7 +327,7 @@ export const Refrigerator: React.FC = () => {
                 backgroundColor: tag.color || "#fef9c3",
                 borderColor: "rgba(0,0,0,0.12)",
                 color: "#1e293b",
-                fontSize: "clamp(9px, 0.85cqw, 13px)",
+                fontSize: `calc(clamp(9px, 0.85cqw, 13px) * ${tag.scale ?? 1})`,
                 padding: "clamp(3px, 0.28cqw, 6px) clamp(6px, 0.55cqw, 12px)",
               }}
             >
@@ -454,10 +463,10 @@ export const Refrigerator: React.FC = () => {
                   transformOrigin: "top center",
                 }}
               >
-                {[...categories]
+                {[...visibleCategories]
                   .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
                   .map((category) => {
-                    const count = recipes.filter((r) => r.categoryId === category.id).length;
+                    const count = visibleRecipes.filter((r) => r.categoryId === category.id).length;
                     return (
                       <CategoryNote
                         key={category.id}

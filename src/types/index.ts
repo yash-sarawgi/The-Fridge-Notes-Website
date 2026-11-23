@@ -35,6 +35,7 @@ export interface Recipe {
   storageTips?: string;
   isSpecial?: boolean;
   isFavorite?: boolean;
+  isHidden?: boolean;
   authorNote?: string;
 }
 
@@ -52,6 +53,7 @@ export interface Category {
   yPos?: number;
   scale?: number;
   displayOrder?: number;
+  isHidden?: boolean;
 }
 
 export interface FridgeTag {
@@ -64,6 +66,7 @@ export interface FridgeTag {
   yPos: number;
   rotation?: number;
   scale?: number;
+  isHidden?: boolean;
 }
 
 export interface FridgeSettings {

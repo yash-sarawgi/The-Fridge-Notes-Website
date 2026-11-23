@@ -32,6 +32,9 @@ import {
   Trash2,
   Tag,
   ClipboardList,
+  Eye,
+  EyeOff,
+  LayoutGrid,
   type LucideIcon,
 } from "lucide-react";
 
@@ -78,6 +81,7 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
   const [selectedTagId, setSelectedTagId] = useState<string>(tagsList[0]?.id || "tag-butter");
 
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [showGuides, setShowGuides] = useState(true);
 
   useEffect(() => {
     setCategories(initialCategoriesProp);
@@ -296,20 +300,100 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
               <Sparkles className="w-3.5 h-3.5 text-sky-400" />
               Interactive Fridge Canvas
             </span>
-            <span className="text-[11px] text-slate-500 font-mono">
-              Click elements to select and edit
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowGuides(!showGuides)}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${
+                  showGuides
+                    ? "bg-sky-500/20 text-sky-300 border border-sky-500/40"
+                    : "bg-slate-900 text-slate-400 hover:text-white border border-slate-800"
+                }`}
+                title="Toggle visual outlines for the fridge doors and handle"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>{showGuides ? "Door Outlines: ON" : "Door Outlines: OFF"}</span>
+              </button>
+              <span className="text-[11px] text-slate-500 font-mono hidden sm:inline">
+                Click to edit
+              </span>
+            </div>
           </div>
 
           {/* Fridge Canvas Box */}
           <div
             className="relative w-full aspect-square max-w-[580px] select-none rounded-xl overflow-hidden border border-slate-700/60 shadow-2xl bg-[#ea580c]/15"
             style={{
-              backgroundImage: "url(/smeg-fridge-bg.jpg)",
+              backgroundImage: "url(/images/smeg-fridge-bg.jpg)",
               backgroundSize: "cover",
               backgroundPosition: "center top",
             }}
           >
+            {/* Visual Fridge Door Outlines & Guides for Arrangement Judgement */}
+            {showGuides && (
+              <div className="absolute inset-0 pointer-events-none z-10">
+                {/* 1. Main Fridge Contour Silhouette */}
+                <div
+                  className="absolute border-2 border-dashed border-sky-400/45 shadow-inner"
+                  style={{
+                    left: "34.4%",
+                    top: "14.0%",
+                    width: "33.3%",
+                    height: "81.0%",
+                    borderRadius: "36px 36px 18px 18px",
+                  }}
+                />
+
+                {/* 2. Freezer Door Outline */}
+                <div
+                  className="absolute border border-dashed border-sky-300/70 bg-sky-500/5 shadow-xs"
+                  style={{
+                    left: "34.7%",
+                    top: "15.4%",
+                    width: "32.7%",
+                    height: "26.5%",
+                    borderRadius: "32px 32px 6px 6px",
+                  }}
+                >
+                  <span className="absolute top-1 left-2 text-[8px] font-mono font-bold tracking-wider text-sky-400 uppercase bg-slate-950/85 px-1.5 py-0.5 rounded border border-sky-500/40 shadow-xs">
+                    Freezer Door
+                  </span>
+                </div>
+
+                {/* 3. Handle Guide Line */}
+                <div
+                  className="absolute border border-slate-200/80 bg-white/20 shadow-sm"
+                  style={{
+                    left: "36.8%",
+                    top: "42.1%",
+                    width: "14.5%",
+                    height: "2.4%",
+                    borderRadius: "9999px",
+                  }}
+                >
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[7.5px] font-mono text-slate-200 uppercase whitespace-nowrap bg-slate-950/85 px-1 rounded border border-slate-700">
+                    Freezer Handle
+                  </span>
+                </div>
+
+                {/* 4. Lower Main Fridge Door Outline */}
+                <div
+                  className="absolute border border-dashed border-amber-400/70 bg-amber-500/5 shadow-xs"
+                  style={{
+                    left: "34.7%",
+                    top: "45.0%",
+                    width: "32.7%",
+                    height: "49.0%",
+                    borderRadius: "6px 6px 16px 16px",
+                  }}
+                >
+                  <span className="absolute bottom-1 right-2 text-[8px] font-mono font-bold tracking-wider text-amber-300 uppercase bg-slate-950/85 px-1.5 py-0.5 rounded border border-amber-500/40 shadow-xs">
+                    Main Refrigerator Door
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Fridge Badge Area at top */}
             <div
               className="absolute z-20 pointer-events-none"
@@ -369,6 +453,7 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
             {/* Dynamic Custom Fridge Sticky Tags */}
             {currentTags.map((tag) => {
               const isSelectedTag = activeTab === "tags" && selectedTag?.id === tag.id;
+              const tagScale = tag.scale ?? 1;
               return (
                 <div
                   key={tag.id}
@@ -378,26 +463,33 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
                   }}
                   className={`absolute z-25 cursor-pointer transition-transform ${
                     isSelectedTag ? "ring-2 ring-sky-400 shadow-lg scale-110" : "hover:scale-105"
-                  }`}
+                  } ${tag.isHidden ? "opacity-50" : ""}`}
                   style={{
                     left: `${tag.xPos}%`,
                     top: `${tag.yPos}%`,
-                    transform: `translate(-50%, -50%) rotate(${tag.rotation ?? 0}deg) scale(${tag.scale ?? 1})`,
+                    transform: `translate(-50%, -50%) rotate(${tag.rotation ?? 0}deg) scale(${tagScale})`,
                   }}
                 >
                   <div
-                    className="relative rounded-xs shadow-sm border text-center whitespace-nowrap p-1 px-1.5"
+                    className={`relative rounded-xs shadow-sm border text-center whitespace-nowrap p-1 px-1.5 ${
+                      tag.isHidden ? "border-dashed border-amber-400" : ""
+                    }`}
                     style={{
                       backgroundColor: tag.color || "#fef9c3",
-                      borderColor: "rgba(0,0,0,0.15)",
+                      borderColor: tag.isHidden ? "#f59e0b" : "rgba(0,0,0,0.15)",
                       color: "#2a1508",
-                      fontSize: "8.5px",
+                      fontSize: `${Math.round(8.5 * tagScale)}px`,
                       fontWeight: "bold",
                     }}
                   >
                     <div className="absolute -top-1.5 left-1/2 -translate-x-1/2">
                       <Magnet color={tag.magnetColor || "#ef4444"} size="sm" shape="round" />
                     </div>
+                    {tag.isHidden && (
+                      <span className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 font-mono text-[7px] font-black px-1 rounded uppercase tracking-wider">
+                        Hidden
+                      </span>
+                    )}
                     <span>{tag.text}</span>
                   </div>
                 </div>
@@ -464,23 +556,38 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
                         isSelected
                           ? "ring-2 ring-sky-500 ring-offset-1 ring-offset-slate-900 shadow-lg z-30"
                           : "hover:scale-105 z-10"
-                      } ${isDragTarget ? "border-2 border-dashed border-sky-400 bg-sky-100" : ""}`}
+                      } ${cat.isHidden ? "opacity-55 border-dashed border-amber-400" : ""} ${
+                        isDragTarget ? "border-2 border-dashed border-sky-400 bg-sky-100" : ""
+                      }`}
                     >
                       {/* Magnet Pin */}
                       <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 pointer-events-none">
                         <Magnet color={cat.magnetColor || "#ef4444"} size="sm" />
                       </div>
 
-                      {/* Header with Icon */}
+                      {/* Header with Icon & Hidden indicator */}
                       <div className="flex items-center justify-between gap-0.5 mt-0.5">
-                        <span className="font-bold text-[9px] text-slate-900 leading-tight truncate">
+                        <span
+                          className="font-bold text-slate-900 leading-tight truncate"
+                          style={{ fontSize: `${Math.round(9 * scale)}px` }}
+                        >
                           {cat.name}
                         </span>
-                        <IconComp className="w-2.5 h-2.5 text-slate-700 shrink-0" />
+                        <div className="flex items-center gap-0.5 shrink-0">
+                          {cat.isHidden && (
+                            <span className="bg-amber-500/90 text-slate-950 font-mono text-[6.5px] font-black px-0.5 rounded leading-none uppercase">
+                              Hidden
+                            </span>
+                          )}
+                          <IconComp className="w-2.5 h-2.5 text-slate-700 shrink-0" />
+                        </div>
                       </div>
 
-                      {/* Description */}
-                      <p className="text-[7.5px] text-slate-700/90 line-clamp-2 leading-tight">
+                      {/* Description with scale-adjusted font */}
+                      <p
+                        className="text-slate-700/90 line-clamp-2 leading-tight"
+                        style={{ fontSize: `${Math.round(7.5 * scale)}px` }}
+                      >
                         {cat.description}
                       </p>
 
@@ -572,6 +679,36 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
 
               {selectedCategory && (
                 <div className="space-y-4 pt-1 text-xs">
+                  {/* Visibility Toggle for Selected Category Note */}
+                  <div className="flex items-center justify-between p-2.5 bg-slate-950 border border-slate-800 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      {selectedCategory.isHidden ? (
+                        <EyeOff className="w-4 h-4 text-amber-400 shrink-0" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
+                      )}
+                      <div>
+                        <span className="font-semibold text-slate-200 block text-xs">
+                          {selectedCategory.isHidden ? "Hidden from Public Fridge" : "Visible on Public Fridge"}
+                        </span>
+                        <span className="text-[10px] text-slate-400 block">
+                          {selectedCategory.isHidden ? "Draft mode — only visible in admin CMS" : "Visitors can click and open recipes"}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => updateSelectedCategory({ isHidden: !selectedCategory.isHidden })}
+                      className={`px-2.5 py-1 rounded text-xs font-semibold transition-all shrink-0 ${
+                        selectedCategory.isHidden
+                          ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30"
+                          : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30"
+                      }`}
+                    >
+                      {selectedCategory.isHidden ? "Unhide" : "Hide Note"}
+                    </button>
+                  </div>
+
                   {/* Slot Reorder Buttons */}
                   <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
                     <label className="font-semibold text-slate-300 block">
@@ -866,6 +1003,36 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
                       title="Remove this tag"
                     >
                       <Trash2 className="w-3 h-3" /> Delete Tag
+                    </button>
+                  </div>
+
+                  {/* Visibility Hide/Unhide Toggle */}
+                  <div className="flex items-center justify-between p-2.5 bg-slate-900 border border-slate-800 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      {selectedTag.isHidden ? (
+                        <EyeOff className="w-4 h-4 text-amber-400 shrink-0" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
+                      )}
+                      <div>
+                        <span className="font-semibold text-slate-200 block text-xs">
+                          {selectedTag.isHidden ? "Hidden from Fridge" : "Visible on Fridge"}
+                        </span>
+                        <span className="text-[10px] text-slate-400 block">
+                          {selectedTag.isHidden ? "Draft mode (not shown on public fridge)" : "Stuck on public fridge door"}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => updateSelectedTag({ isHidden: !selectedTag.isHidden })}
+                      className={`px-2.5 py-1 rounded text-xs font-semibold transition-all shrink-0 ${
+                        selectedTag.isHidden
+                          ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30"
+                          : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30"
+                      }`}
+                    >
+                      {selectedTag.isHidden ? "Unhide" : "Hide Tag"}
                     </button>
                   </div>
 

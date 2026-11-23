@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Category } from "@/types";
-import { X, Check, Sparkles, Palette } from "lucide-react";
+import { X, Check, Sparkles, Palette, Eye, EyeOff } from "lucide-react";
 
 interface CategoryEditorModalProps {
   isOpen: boolean;
@@ -25,6 +25,7 @@ export const CategoryEditorModal: React.FC<CategoryEditorModalProps> = ({
   const [color, setColor] = useState("#fef08a");
   const [magnetColor, setMagnetColor] = useState("#ef4444");
   const [iconName, setIconName] = useState("sparkles");
+  const [isHidden, setIsHidden] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -36,6 +37,7 @@ export const CategoryEditorModal: React.FC<CategoryEditorModalProps> = ({
       setColor(category.color || "#fef08a");
       setMagnetColor(category.magnetColor || "#ef4444");
       setIconName(category.iconName || "sparkles");
+      setIsHidden(category.isHidden || false);
     } else {
       setName("");
       setSlug("");
@@ -43,6 +45,7 @@ export const CategoryEditorModal: React.FC<CategoryEditorModalProps> = ({
       setColor("#fef08a");
       setMagnetColor("#ef4444");
       setIconName("sparkles");
+      setIsHidden(false);
     }
     setErrorMsg(null);
   }, [category, isOpen]);
@@ -82,6 +85,7 @@ export const CategoryEditorModal: React.FC<CategoryEditorModalProps> = ({
       yPos: category?.yPos,
       pinPosition: category?.pinPosition || "top-center",
       displayOrder: category?.displayOrder ?? 99,
+      isHidden,
     };
 
     try {
@@ -120,6 +124,38 @@ export const CategoryEditorModal: React.FC<CategoryEditorModalProps> = ({
         )}
 
         <form onSubmit={handleSave} className="p-6 space-y-4 text-xs">
+          {/* Visibility Hide/Unhide Toggle */}
+          <div className="flex items-center justify-between p-3 bg-slate-900 border border-slate-800 rounded-lg">
+            <div className="flex items-center gap-2">
+              {isHidden ? (
+                <EyeOff className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Eye className="w-4 h-4 text-emerald-400" />
+              )}
+              <div>
+                <span className="font-semibold text-slate-200 block text-xs">
+                  {isHidden ? "Hidden from Public Fridge (Draft Mode)" : "Visible on Public Fridge"}
+                </span>
+                <span className="text-[10.5px] text-slate-400 block">
+                  {isHidden
+                    ? "Keep editing privately — visitors won't see this category note on the fridge."
+                    : "Visitors can see and browse recipes in this category note."}
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsHidden(!isHidden)}
+              className={`px-3 py-1.5 rounded text-xs font-semibold transition-all ${
+                isHidden
+                  ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30"
+                  : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30"
+              }`}
+            >
+              {isHidden ? "Unhide" : "Hide Note"}
+            </button>
+          </div>
+
           <div>
             <label className="block font-medium text-slate-300 mb-1">Category Name *</label>
             <input

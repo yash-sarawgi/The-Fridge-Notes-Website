@@ -85,6 +85,7 @@ export async function fetchFridgeData(): Promise<{
             yPos: c.y_pos,
             scale: c.scale ?? 1,
             displayOrder: c.display_order,
+            isHidden: c.is_hidden ?? false,
           }))
         : initialCategories;
 
@@ -117,6 +118,7 @@ export async function fetchFridgeData(): Promise<{
             storageTips: r.storage_tips || "",
             isSpecial: r.is_special || false,
             isFavorite: r.is_favorite || false,
+            isHidden: r.is_hidden || false,
             authorNote: r.author_note || "",
           }))
         : initialRecipes;
@@ -222,6 +224,7 @@ export async function saveRecipeToSupabase(recipe: Recipe): Promise<boolean> {
     storage_tips: recipe.storageTips || null,
     is_special: recipe.isSpecial || false,
     is_favorite: recipe.isFavorite || false,
+    is_hidden: recipe.isHidden || false,
     author_note: recipe.authorNote || null,
     updated_at: new Date().toISOString(),
   };
@@ -270,6 +273,7 @@ export async function saveCategoryToSupabase(category: Category): Promise<boolea
     y_pos: category.yPos ?? null,
     scale: category.scale ?? 1,
     display_order: category.displayOrder ?? 0,
+    is_hidden: category.isHidden ?? false,
     updated_at: new Date().toISOString(),
   };
 
@@ -359,6 +363,7 @@ export async function saveArrangedLayoutToSupabase(params: {
       magnet_color: c.magnetColor,
       scale: c.scale ?? 1,
       rotation: c.rotation ?? 0,
+      is_hidden: c.isHidden ?? false,
       updated_at: new Date().toISOString(),
     }).eq("id", c.id)
   );
