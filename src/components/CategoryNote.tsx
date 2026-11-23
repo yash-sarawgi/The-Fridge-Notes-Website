@@ -70,9 +70,9 @@ export const CategoryNote: React.FC<CategoryNoteProps> = ({
       style={{
         backgroundColor: category.color,
         transform: `rotate(${category.rotation}deg) scale(${category.scale || 1})`,
-        padding: "clamp(6px, 0.75cqw, 14px)",
-        paddingTop: "clamp(10px, 1.25cqw, 22px)",
-        paddingBottom: "clamp(6px, 0.7cqw, 12px)",
+        padding: "clamp(8px, 0.9cqw, 18px)",
+        paddingTop: "clamp(12px, 1.4cqw, 26px)",
+        paddingBottom: "clamp(8px, 0.85cqw, 16px)",
       }}
       aria-label={`Category: ${category.name}, ${recipeCount} recipes. Click to open.`}
     >
@@ -85,39 +85,39 @@ export const CategoryNote: React.FC<CategoryNoteProps> = ({
       <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-black/5 [clip-path:polygon(0_0,100%_100%,0_100%)] pointer-events-none" />
 
       {/* Note Header with handwritten title */}
-      <div>
-        <div className="flex items-center justify-between gap-1 mb-0.5">
+      <div className="flex-1 flex flex-col justify-start">
+        <div className="flex items-center justify-between gap-1 mb-1">
           <h3
             className="font-handwriting font-bold text-[#2b1810] tracking-wide leading-tight group-hover:text-amber-900 transition-colors truncate"
-            style={{ fontSize: `calc(clamp(11px, 1.2cqw, 20px) * ${scale})` }}
+            style={{ fontSize: `calc(clamp(15px, 1.6cqw, 28px) * ${scale})` }}
           >
             {category.name}
           </h3>
-          <span className="p-0.5 rounded-full bg-black/5 text-[#422517] group-hover:bg-black/10 transition-transform shrink-0">
-            <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <span className="p-0.5 sm:p-1 rounded-full bg-black/5 text-[#422517] group-hover:bg-black/10 transition-transform shrink-0">
+            <IconComponent className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" />
           </span>
         </div>
 
         {/* Description */}
         <p
-          className="font-handwriting text-[#4b3327]/90 line-clamp-2 leading-snug"
-          style={{ fontSize: `calc(clamp(9px, 0.9cqw, 14px) * ${scale})` }}
+          className="font-handwriting text-[#4b3327]/90 line-clamp-3 leading-snug mt-0.5"
+          style={{ fontSize: `calc(clamp(12px, 1.25cqw, 20px) * ${scale})` }}
         >
           {category.description}
         </p>
       </div>
 
       {/* Footer count tag / sticker */}
-      <div className="flex items-center justify-between pt-1 border-t border-black/10 mt-auto">
+      <div className="flex items-center justify-between pt-1.5 border-t border-black/10 mt-auto">
         <span
-          className="font-handwriting font-semibold px-1.5 py-0.5 rounded-full bg-white/75 text-[#3b2416] border border-black/5 shadow-xs"
-          style={{ fontSize: `calc(clamp(8px, 0.8cqw, 12px) * ${scale})` }}
+          className="font-handwriting font-semibold px-2 py-0.5 rounded-full bg-white/75 text-[#3b2416] border border-black/5 shadow-xs"
+          style={{ fontSize: `calc(clamp(10px, 0.95cqw, 15px) * ${scale})` }}
         >
           {recipeCount} {recipeCount === 1 ? "recipe" : "recipes"}
         </span>
         <span
           className="font-handwriting font-bold text-[#6d4128] group-hover:translate-x-0.5 transition-transform inline-flex items-center gap-0.5"
-          style={{ fontSize: `calc(clamp(9px, 0.85cqw, 13px) * ${scale})` }}
+          style={{ fontSize: `calc(clamp(11px, 1.05cqw, 16px) * ${scale})` }}
         >
           Open ➔
         </span>

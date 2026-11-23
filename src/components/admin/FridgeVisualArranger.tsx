@@ -471,14 +471,14 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
                   }}
                 >
                   <div
-                    className={`relative rounded-xs shadow-sm border text-center whitespace-nowrap p-1 px-1.5 ${
+                    className={`relative rounded-xs shadow-sm border text-center whitespace-nowrap p-1 px-2.5 ${
                       tag.isHidden ? "border-dashed border-amber-400" : ""
                     }`}
                     style={{
                       backgroundColor: tag.color || "#fef9c3",
                       borderColor: tag.isHidden ? "#f59e0b" : "rgba(0,0,0,0.15)",
                       color: "#2a1508",
-                      fontSize: `${Math.round(8.5 * tagScale)}px`,
+                      fontSize: `${Math.max(9, Math.round(11 * tagScale))}px`,
                       fontWeight: "bold",
                     }}
                   >
@@ -569,13 +569,13 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
                       <div className="flex items-center justify-between gap-0.5 mt-0.5">
                         <span
                           className="font-bold text-slate-900 leading-tight truncate"
-                          style={{ fontSize: `${Math.round(9 * scale)}px` }}
+                          style={{ fontSize: `${Math.max(10, Math.round(11 * scale))}px` }}
                         >
                           {cat.name}
                         </span>
                         <div className="flex items-center gap-0.5 shrink-0">
                           {cat.isHidden && (
-                            <span className="bg-amber-500/90 text-slate-950 font-mono text-[6.5px] font-black px-0.5 rounded leading-none uppercase">
+                            <span className="bg-amber-500/90 text-slate-950 font-mono text-[7px] font-black px-1 rounded leading-none uppercase">
                               Hidden
                             </span>
                           )}
@@ -585,8 +585,8 @@ export const FridgeVisualArranger: React.FC<FridgeVisualArrangerProps> = ({
 
                       {/* Description with scale-adjusted font */}
                       <p
-                        className="text-slate-700/90 line-clamp-2 leading-tight"
-                        style={{ fontSize: `${Math.round(7.5 * scale)}px` }}
+                        className="text-slate-700/90 line-clamp-3 leading-tight"
+                        style={{ fontSize: `${Math.max(8.5, Math.round(9.5 * scale))}px` }}
                       >
                         {cat.description}
                       </p>

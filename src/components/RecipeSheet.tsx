@@ -91,80 +91,69 @@ export const RecipeSheet: React.FC<RecipeSheetProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto z-40 my-2 px-2 sm:px-4">
-      {/* Physical Paper Sheet attached with Large Magnet & Tape */}
-      <div
-        className="relative bg-[#fffdfa] rounded-sm paper-shadow-lifted border border-amber-900/10 overflow-hidden text-[#2c221e] animate-in fade-in zoom-in-95 duration-200"
-        style={{
-          boxShadow: `
-            0 1px 3px rgba(0,0,0,0.1),
-            0 25px 45px -12px rgba(45,30,20,0.35),
-            0 40px 70px -20px rgba(45,30,20,0.2)
-          `,
-        }}
-      >
-        {/* Top Magnet & Washi Tape Holding the Recipe */}
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center">
-          <Magnet color="#dc2626" size="lg" shape="round" />
-        </div>
+    <div className="relative w-full h-full flex flex-col bg-[#fffdfa] rounded-2xl overflow-hidden text-[#2c221e] shadow-2xl">
+      {/* Top Magnet & Washi Tape Holding the Recipe */}
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-30 flex items-center justify-center">
+        <Magnet color="#dc2626" size="lg" shape="round" />
+      </div>
 
-        {/* Vintage Top Navigation Bar on Paper */}
-        <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-amber-900/10 bg-[#faf6ed]">
+      {/* Vintage Top Navigation Bar on Paper */}
+      <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-amber-900/10 bg-[#faf6ed] shrink-0">
+        <button
+          onClick={onClose}
+          className="group flex items-center gap-1.5 font-handwriting text-base sm:text-lg font-bold text-amber-950 hover:text-amber-700 transition-colors cursor-pointer"
+          aria-label="Back to fridge notes"
+        >
+          <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>
+          <span>Pin back to fridge</span>
+        </button>
+
+        <div className="flex items-center gap-2">
+          {/* Share / Copy Button */}
           <button
-            onClick={onClose}
-            className="group flex items-center gap-1.5 font-handwriting text-base sm:text-lg font-bold text-amber-950 hover:text-amber-700 transition-colors cursor-pointer"
-            aria-label="Back to fridge notes"
+            onClick={handleShare}
+            className="p-1.5 rounded-full hover:bg-black/5 text-amber-900 transition-colors"
+            title="Copy ingredients to clipboard"
+            aria-label="Share recipe"
           >
-            <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>
-            <span>Pin back to fridge</span>
+            {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
           </button>
 
-          <div className="flex items-center gap-2">
-            {/* Share / Copy Button */}
-            <button
-              onClick={handleShare}
-              className="p-1.5 rounded-full hover:bg-black/5 text-amber-900 transition-colors"
-              title="Copy ingredients to clipboard"
-              aria-label="Share recipe"
-            >
-              {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
-            </button>
+          {/* Print Recipe Button */}
+          <button
+            onClick={handlePrint}
+            className="p-1.5 rounded-full hover:bg-black/5 text-amber-900 transition-colors"
+            title="Print recipe card"
+            aria-label="Print recipe"
+          >
+            <Printer className="w-4 h-4" />
+          </button>
 
-            {/* Print Recipe Button */}
-            <button
-              onClick={handlePrint}
-              className="p-1.5 rounded-full hover:bg-black/5 text-amber-900 transition-colors"
-              title="Print recipe card"
-              aria-label="Print recipe"
-            >
-              <Printer className="w-4 h-4" />
-            </button>
+          {/* Favorite Pin */}
+          <button
+            onClick={handleFavoriteClick}
+            className={`p-1.5 rounded-full transition-all ${
+              recipe.isFavorite ? "text-rose-600 scale-110" : "text-stone-400 hover:text-rose-600"
+            }`}
+            title={recipe.isFavorite ? "Favorited" : "Add to favorites"}
+            aria-label="Toggle favorite"
+          >
+            <Heart className={`w-4 h-4 ${recipe.isFavorite ? "fill-rose-600" : ""}`} />
+          </button>
 
-            {/* Favorite Pin */}
-            <button
-              onClick={handleFavoriteClick}
-              className={`p-1.5 rounded-full transition-all ${
-                recipe.isFavorite ? "text-rose-600 scale-110" : "text-stone-400 hover:text-rose-600"
-              }`}
-              title={recipe.isFavorite ? "Favorited" : "Add to favorites"}
-              aria-label="Toggle favorite"
-            >
-              <Heart className={`w-4 h-4 ${recipe.isFavorite ? "fill-rose-600" : ""}`} />
-            </button>
-
-            {/* Close Button */}
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-full hover:bg-black/10 text-stone-600 hover:text-stone-900 transition-colors ml-2"
-              aria-label="Close recipe"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-full hover:bg-black/10 text-stone-600 hover:text-stone-900 transition-colors ml-2 cursor-pointer"
+            aria-label="Close recipe"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
+      </div>
 
-        {/* Scrollable Recipe Content Body */}
-        <div className="max-h-[75vh] sm:max-h-[78vh] overflow-y-auto px-5 sm:px-8 py-6 space-y-6">
+      {/* Scrollable Recipe Content Body */}
+      <div className="flex-1 overflow-y-auto px-6 sm:px-10 py-6 space-y-6">
           
           {/* Header Section */}
           <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -398,6 +387,5 @@ export const RecipeSheet: React.FC<RecipeSheetProps> = ({
           </div>
         </div>
       </div>
-    </div>
   );
 };

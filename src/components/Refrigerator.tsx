@@ -287,7 +287,7 @@ export const Refrigerator: React.FC = () => {
           <div
             className="relative bg-[#fefce8] text-[#2c1d11] rounded-xs paper-shadow-md border border-amber-200/90 text-center transition-transform duration-200 hover:rotate-0"
             style={{
-              padding: "clamp(4px, 0.5cqw, 10px) clamp(6px, 0.8cqw, 16px)",
+              padding: "clamp(6px, 0.7cqw, 14px) clamp(10px, 1.1cqw, 22px)",
               clipPath: "polygon(0 0, 100% 0.5%, 99.5% 99.5%, 0.5% 100%)",
             }}
           >
@@ -296,13 +296,13 @@ export const Refrigerator: React.FC = () => {
             </div>
             <p
               className="font-handwriting font-bold leading-tight text-amber-950"
-              style={{ fontSize: "clamp(11px, 1.1cqw, 18px)" }}
+              style={{ fontSize: "clamp(14px, 1.5cqw, 26px)" }}
             >
               &ldquo;{settings.tagline}&rdquo;
             </p>
             <p
-              className="font-handwriting text-amber-900/90 leading-snug mt-0.5 mx-auto"
-              style={{ fontSize: "clamp(9px, 0.85cqw, 13px)" }}
+              className="font-handwriting text-amber-900/90 leading-snug mt-1 mx-auto"
+              style={{ fontSize: "clamp(11px, 1.15cqw, 18px)" }}
             >
               {settings.subIntro}
             </p>
@@ -322,16 +322,16 @@ export const Refrigerator: React.FC = () => {
             }}
           >
             <div
-              className="relative font-handwriting font-bold rounded shadow-sm border text-center whitespace-nowrap"
+              className="relative font-handwriting font-bold rounded-sm shadow-md border text-center whitespace-nowrap"
               style={{
                 backgroundColor: tag.color || "#fef9c3",
-                borderColor: "rgba(0,0,0,0.12)",
+                borderColor: "rgba(0,0,0,0.14)",
                 color: "#1e293b",
-                fontSize: `calc(clamp(9px, 0.85cqw, 13px) * ${tag.scale ?? 1})`,
-                padding: "clamp(3px, 0.28cqw, 6px) clamp(6px, 0.55cqw, 12px)",
+                fontSize: `calc(clamp(13px, 1.35cqw, 24px) * ${tag.scale ?? 1})`,
+                padding: "clamp(5px, 0.55cqw, 12px) clamp(10px, 1.1cqw, 22px)",
               }}
             >
-              <div className="absolute -top-2 right-1 pointer-events-none">
+              <div className="absolute -top-2.5 right-1 pointer-events-none">
                 <Magnet color={tag.magnetColor || "#ef4444"} size="sm" shape="heart" />
               </div>
               <span className="leading-tight drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]">
@@ -339,7 +339,7 @@ export const Refrigerator: React.FC = () => {
               </span>
               {tag.subText && (
                 <div
-                  className="font-normal opacity-80 mt-0.5"
+                  className="font-normal opacity-85 mt-0.5"
                   style={{ fontSize: "0.85em" }}
                 >
                   {tag.subText}
@@ -364,17 +364,8 @@ export const Refrigerator: React.FC = () => {
             width: "30.5%",
           }}
         >
-          {/* VIEW 1: EXPANDED RECIPE SHEET */}
-          {selectedRecipe ? (
-            <div className="w-full pb-8">
-              <RecipeSheet
-                recipe={selectedRecipe}
-                onClose={handleCloseRecipe}
-                onToggleFavorite={(id) => handleToggleFavorite(id)}
-                soundEnabled={soundEnabled}
-              />
-            </div>
-          ) : selectedCategoryId || searchQuery ? (
+          {/* VIEW: DISH NOTES (WHEN CATEGORY IS SELECTED OR SEARCHING) */}
+          {selectedCategoryId || searchQuery ? (
 
             /* VIEW 2: DISH NOTES FOR SELECTED CATEGORY OR SEARCH */
             <div className="w-full flex flex-col items-center gap-3 pb-8">
@@ -485,6 +476,30 @@ export const Refrigerator: React.FC = () => {
 
       </div>
       {/* END 1:1 FRIDGE SCENE CONTAINER */}
+
+      {/* ============================================================== */}
+      {/* FULLSCREEN BLURRED RECIPE POPUP (OCCUPIES MAJORITY OF SCREEN)  */}
+      {/* ============================================================== */}
+      {selectedRecipe && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-10 lg:p-12 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={handleCloseRecipe}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="relative w-full max-w-5xl max-h-[92vh] overflow-hidden rounded-2xl shadow-2xl flex flex-col bg-[#fffdfa] border border-amber-900/20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <RecipeSheet
+              recipe={selectedRecipe}
+              onClose={handleCloseRecipe}
+              onToggleFavorite={(id) => handleToggleFavorite(id)}
+              soundEnabled={soundEnabled}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Admin Modal */}
       <AdminModal

@@ -88,21 +88,21 @@ export const DishNote: React.FC<DishNoteProps> = ({
         <div className="pt-2 px-1 text-center">
           <h4
             className="font-handwriting font-bold text-[#2a170e] leading-snug line-clamp-2 group-hover:text-amber-900 transition-colors"
-            style={{ fontSize: `calc(clamp(11px, 1.15cqw, 20px) * ${scale})` }}
+            style={{ fontSize: `calc(clamp(14px, 1.5cqw, 24px) * ${scale})` }}
           >
             {recipe.title}
           </h4>
 
           <div
             className="flex items-center justify-center gap-2 mt-1 text-[#5c4033]/80 font-handwriting font-medium"
-            style={{ fontSize: `calc(clamp(9px, 0.85cqw, 13px) * ${scale})` }}
+            style={{ fontSize: `calc(clamp(11px, 1.1cqw, 16px) * ${scale})` }}
           >
             <span className="flex items-center gap-0.5">
-              <Clock className="w-3 h-3 text-amber-700" /> {recipe.totalTime}
+              <Clock className="w-3.5 h-3.5 text-amber-700" /> {recipe.totalTime}
             </span>
             <span>•</span>
             <span className="flex items-center gap-0.5">
-              <ChefHat className="w-3 h-3 text-amber-700" /> {recipe.difficulty}
+              <ChefHat className="w-3.5 h-3.5 text-amber-700" /> {recipe.difficulty}
             </span>
           </div>
         </div>
@@ -119,8 +119,8 @@ export const DishNote: React.FC<DishNoteProps> = ({
       style={{
         backgroundColor: recipe.paperColor || "#fef08a",
         transform: `rotate(${rotation}deg)`,
-        padding: "clamp(6px, 0.75cqw, 14px)",
-        paddingTop: "clamp(10px, 1.2cqw, 20px)",
+        padding: "clamp(8px, 0.9cqw, 18px)",
+        paddingTop: "clamp(12px, 1.35cqw, 24px)",
       }}
       tabIndex={0}
       role="button"
@@ -157,19 +157,19 @@ export const DishNote: React.FC<DishNoteProps> = ({
       <div>
         <span
           className="font-handwriting uppercase tracking-wider text-black/60 font-bold block mb-0.5"
-          style={{ fontSize: `calc(clamp(8px, 0.75cqw, 11px) * ${scale})` }}
+          style={{ fontSize: `calc(clamp(10px, 0.95cqw, 14px) * ${scale})` }}
         >
           {recipe.categoryName} Note
         </span>
         <h4
           className="font-handwriting font-bold text-[#2b1810] leading-tight line-clamp-2 group-hover:text-amber-900 transition-colors"
-          style={{ fontSize: `calc(clamp(11px, 1.15cqw, 20px) * ${scale})` }}
+          style={{ fontSize: `calc(clamp(14px, 1.5cqw, 24px) * ${scale})` }}
         >
           {recipe.title}
         </h4>
         <p
-          className="font-handwriting text-[#4d3327]/85 line-clamp-2 leading-snug mt-1"
-          style={{ fontSize: `calc(clamp(9px, 0.88cqw, 13px) * ${scale})` }}
+          className="font-handwriting text-[#4d3327]/85 line-clamp-3 leading-snug mt-1"
+          style={{ fontSize: `calc(clamp(12px, 1.2cqw, 18px) * ${scale})` }}
         >
           {recipe.description}
         </p>
@@ -177,8 +177,8 @@ export const DishNote: React.FC<DishNoteProps> = ({
 
       {/* Sticky note bottom details */}
       <div
-        className="pt-1 border-t border-black/10 flex items-center justify-between font-handwriting text-[#533525] mt-auto"
-        style={{ fontSize: `calc(clamp(8.5px, 0.8cqw, 12px) * ${scale})` }}
+        className="pt-1.5 border-t border-black/10 flex items-center justify-between font-handwriting text-[#533525] mt-auto"
+        style={{ fontSize: `calc(clamp(11px, 1.05cqw, 15px) * ${scale})` }}
       >
         <span className="flex items-center gap-0.5 font-semibold">
           <Clock className="w-3 h-3 text-amber-800" /> {recipe.totalTime}
